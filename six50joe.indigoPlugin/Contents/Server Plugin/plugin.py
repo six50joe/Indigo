@@ -7,6 +7,7 @@ import indigo
 import os
 import sys
 import logging
+import time
 #import json, operator
 #import csv,codecs,cStringIO
 #from lib.csvUnicode import unicodeReader, unicodeWriter, UTF8Recoder
@@ -160,16 +161,22 @@ class Plugin(indigo.PluginBase):
 	########################################
 
 	def pingOtherHouse(self, action):
-#		self.extDebug(u'CALL resetTriggerBatteryLevel')
-#		self.extDebug(u'action: %s' % unicode(action))
-		
+                host = sys.argv[1]
+                NUM_RETRIES = int(sys.argv[2])
+                RETRY_WAIT  = int(sys.argv[3])
+
 		props = action.props
-                self.logger.debug("HEEERE")
-                self.loger.info(str(props))
-				
-#		try:
-#			trigger = indigo.triggers[int(props[u'trigger'])]
-#		except:
-#			self.logger.error(u'Reset trigger battery level: Could not get selected trigger from Indigo')
-#			return False
+
+                for i in range(0, props[u'numRetries']):
+                        rc = subprocess.call("/sbin/ping -t 1 -c 1 %s" \
+                                             % (props[u'ipOrUrl'] ),
+                                             shell=True,
+                                             stdout=subprocess.PIPE)
+
+                        if rc == 0:
+                                self.logger.debug("ping reached %s" % props[u'ipOrUrl'])
+                                return True
+                        else:
+                                self.logger.debug("retry ping to %s" % props[u'ipOrUrl'])
+                                time.sleep(props[u'retrySecs'])
 					
