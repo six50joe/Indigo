@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<Actions>
+    <SupportURL>https://12ridgegarden.dyndns.org</SupportURL>
+	<Action id="pingOtherHouse">
+		<Name>Ping other house</Name>
+		<CallbackMethod>pingOtherHouse</CallbackMethod>
+		<ConfigUI>
+			<Field id="ipOrUrl" type="textfield">
+				<Label>IP or URL:</Label>
+			</Field>
+			<Field id="retrySecs" type="textfield">
+				<Label>Seconds between retries:</Label>
+			</Field>
+			<Field id="numRetries" type="textfield">
+				<Label>Number of retries:</Label>
+			</Field>
+		</ConfigUI>
+	</Action>
+
+	<!-- Exampole of menu
+        	<Field type="menu" id="includeFor" defaultValue="all">
+        		<Label>Included in statistics:</Label>
+        		<List>
+        			<Option value="all">All Z-wave devices</Option>
+        			<Option value="excludeSelected">All, except selected Z-wave devices</Option>
+        			<Option value="selected">Selected devices</Option>
+        		</List>
+        		</Field>
+	-->
+	<!-- Example of list
+        <Field type="list" id="devices" rows="6" visibleBindingId="includeFor" visibleBindingValue="selected,excludeSelected" alwaysUseInDialogHeightCalc="true">
+        		<Label>Select devices:</Label>
+        		<List class="self" method="getUIList" filter="zDeviceList"/>
+        	</Field>
+        	
+        -->
+</Actions>
