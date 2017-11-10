@@ -17,6 +17,7 @@ from collections import defaultdict
 #from texttable.texttable import Texttable
 from operator import itemgetter
 #from ghpu import GitHubPluginUpdater
+from ghpu import GitHubPluginUpdater
 
 # Note the "indigo" module is automatically imported and made available inside
 # our global name space by the host process.
@@ -97,9 +98,46 @@ class Plugin(indigo.PluginBase):
 	def startup(self):
 		self.logger.debug(u"startup called")
 
-		# self.logger.debug(u'Subscribing to incoming Z-wave commands')
-		# indigo.zwave.subscribeToIncoming()
+		self.logger.debug(u'Getting plugin updater)
+		self.updater = GitHubPluginUpdater(self)
 		
+
+	########################################
+	def updatePlugin(self):
+		
+		self.logger.info(u'Initiating plugin update')
+		updateResult = self.updater.update()
+		
+		return updateResult
+
+	########################################
+	def checkPluginUpdates(self, notify = False, performUpdate = False):
+		
+		self.logger.debug(u'Checking for plugin updates')
+		updateAvailable = self.updater.checkForUpdate()
+		
+		if updateAvailable:
+			if notify and len(self.checkForUpdatesEmail) > 0:
+				self.logger.debug(u'Notifying that new plugin version is available via e-mail')
+				indigo.server.sendEmailTo(self.checkForUpdatesEmail, 
+					subject=u'Indigo %s plugin update available' % (self.pluginName), 
+					body=u'A new update of %s plugin is available and can be updated from the plugin menu within Indigo' % (self.pluginName))
+					
+			if performUpdate:
+				self.updatePlugin()
+				
+		return updateAvailable
+
+	# Catch changes to config prefs
+	def closedPrefsConfigUi(self, valuesDict, userCancelled):
+		self.extDebug(u'CALL closedPrefsConfigUi, valuesDict: %s' % unicode(valuesDict))
+		self.extDebug(u'CALL closedPrefsConfigUi, userCancelled: %s' % unicode(userCancelled))
+		
+		self.setUpdatePluginPrefs(True)
+
+		# FIX DO VALIDATION
+		self.pluginConfigErrorState = False
+
 	########################################
 	def shutdown(self):
 		self.logger.debug(u"shutdown called")
