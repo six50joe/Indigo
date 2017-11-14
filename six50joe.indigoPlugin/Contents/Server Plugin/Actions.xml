@@ -16,22 +16,4 @@
 			</Field>
 		</ConfigUI>
 	</Action>
-
-	<!-- Exampole of menu
-        	<Field type="menu" id="includeFor" defaultValue="all">
-        		<Label>Included in statistics:</Label>
-        		<List>
-        			<Option value="all">All Z-wave devices</Option>
-        			<Option value="excludeSelected">All, except selected Z-wave devices</Option>
-        			<Option value="selected">Selected devices</Option>
-        		</List>
-        		</Field>
-	-->
-	<!-- Example of list
-        <Field type="list" id="devices" rows="6" visibleBindingId="includeFor" visibleBindingValue="selected,excludeSelected" alwaysUseInDialogHeightCalc="true">
-        		<Label>Select devices:</Label>
-        		<List class="self" method="getUIList" filter="zDeviceList"/>
-        	</Field>
-        	
-        -->
 </Actions>

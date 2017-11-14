@@ -20,46 +20,4 @@
 		<Name>Update Plugin</Name>
 		<CallbackMethod>updatePlugin</CallbackMethod>
 	</MenuItem>
- 
-	<!-- Example Stuff
-
-
-
-	<MenuItem id="separator2" />
-	<MenuItem id="printNodeStatsToLog">
-		<Name>Output Z-wave node statistics to Indigo log</Name>
-		<CallbackMethod>printNodeStatsToLogEmail</CallbackMethod>
-	</MenuItem>
-		<Name>RESET ALL Z-wave node statistics...</Name>
-		<ConfigUI>
-			<Field id="resetNodeStatsLabel" type="label">
-				<Label>Pressing the button will reset all Z-wave node statistics</Label>
-			</Field>
-        	<Field id="resetNodeStats" type="button" tooltip="Will reset all Z-wave node statistics">
-				<Title>Reset statistics</Title>
-				<CallbackMethod>resetNodeStats</CallbackMethod>
-			</Field>
-		</ConfigUI>
-		</MenuItem-->
-	<!--
-	<MenuItem id="resetNodeStats">
-		<Name>RESET ALL Z-wave node statistics...</Name>
-		<CallbackMethod>resetNodeStats</CallbackMethod>
-		<ButtonTitle>Reset</ButtonTitle>
-		<ConfigUI>
-			<Field id="resetNodeStatsLabel" type="label">
-				<Label>Pressing the button will reset all Z-wave node statistics</Label>
-			</Field>
-		</ConfigUI>
-	</MenuItem>
-	<MenuItem id="separator" />
-	<MenuItem id="checkPluginUpdates">
-		<Name>Check for plugin updates</Name>
-		<CallbackMethod>checkPluginUpdates</CallbackMethod>
-	</MenuItem>
-	<MenuItem id="updatePlugin">
-		<Name>Update Plugin</Name>
-		<CallbackMethod>updatePlugin</CallbackMethod>
-		</MenuItem>
-	-->
 </MenuItems>

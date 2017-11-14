@@ -98,7 +98,7 @@ class Plugin(indigo.PluginBase):
 	def startup(self):
 		self.logger.debug(u"startup called")
 
-		self.logger.debug(u'Getting plugin updater)
+		self.logger.debug(u'Getting plugin updater')
 		self.updater = GitHubPluginUpdater(self)
 		
 
