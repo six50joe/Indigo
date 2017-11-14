@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <Actions>
-    <SupportURL>https://12ridgegarden.dyndns.org</SupportURL>
+    <SupportURL>https://github.com/six50joe/Indigo</SupportURL>
 	<Action id="pingOtherHouse">
 		<Name>Ping other house</Name>
 		<CallbackMethod>pingOtherHouse</CallbackMethod>
