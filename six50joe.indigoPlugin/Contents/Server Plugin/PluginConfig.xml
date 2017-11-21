@@ -13,7 +13,6 @@
 		<Label>Extensive debug log</Label>
 	</Field>
 	<Field type="label" id="emptylabelUpdates">
-		<Label>
-		</Label>
+		<Label> " "</Label>
 	</Field>
 </PluginConfig>

@@ -11,7 +11,7 @@
 		<Name>Ping Other House...</Name>
 		<ConfigUI actionId="pingOtherHouse"/>
 	</MenuItem>
-	<MenuItem id="separator2" />
+	<MenuItem id="separator" />
 	<MenuItem id="checkPluginUpdates">
 		<Name>Check for plugin updates</Name>
 		<CallbackMethod>checkPluginUpdates</CallbackMethod>
