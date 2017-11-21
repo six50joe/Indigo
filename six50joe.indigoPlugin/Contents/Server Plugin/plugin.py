@@ -89,6 +89,10 @@ class Plugin(indigo.PluginBase):
 		self.errorState = False
 
 		self.pluginName = u'Six50Joe'
+
+                # Set plugin preferences
+		self.setUpdatePluginPrefs()
+
 			
 	########################################
 	def __del__(self):
@@ -191,6 +195,117 @@ class Plugin(indigo.PluginBase):
 
 				
 		
+	#####
+	# Set or update plugin preferences
+	# 	running 		: True if plugin is already running and prefs are to be changed
+	#
+	def setUpdatePluginPrefs(self, running = False):
+		self.logger.debug(u'CALL setUpdatePluginPrefs, running: %s' % unicode(running))
+		
+		# Set log levels
+		if running: setText = u'Changing'
+		else: setText = u'Setting'
+		self.indigo_log_handler.setLevel(self.pluginPrefs.get(u'logLevel', u'INFO'))
+		self.plugin_file_handler.setLevel(u'DEBUG')
+		self.extensiveDebug = self.pluginPrefs.get(u'extensiveDebug', False)
+		self.logger.info(u'%s log level to %s' % (setText, self.pluginPrefs.get(u'logLevel', u'INFO')))
+		self.logger.debug(u'Extensive debug logging set to %s' % unicode(self.extensiveDebug))
+		self.logger.debug(u'%s file handler log level to DEBUG' % (setText))
+		# DEBUG		: All debug info
+		# INFO		: Informational messages relevant to the user
+		# WARNING	: More critical information to the user, warnings
+		# ERROR		: Errors not critical for plugin execution
+		# CRITICAL	: Errors critical for plugin execution, plugin will stop
+		
+		self.checkForUpdatesInterval = self.pluginPrefs.get(u'checkForUpdatesInterval', 24)
+		if self.checkForUpdatesInterval == u'':
+			self.checkForUpdates = False
+		else:
+			self.checkForUpdates = True
+			try:
+				self.checkForUpdatesInterval = int(self.checkForUpdatesInterval)
+			except:
+				self.logger.error(u'Invalid plugin prefs value for update check frequency, defaulting to 24 hours')
+				self.checkForUpdatesInterval = 24
+				
+			self.checkForUpdatesEmail = self.pluginPrefs.get(u'checkForUpdatesEmail', '')
+		
+		#self.autoUpdate = self.pluginPrefs.get(u'autoUpdate', False)
+		# FIX, Indigo will ask for confirmation before plugin is updates, so best to leave as manual menu option
+		self.autoUpdate = False
+		
+		self.keepStats = self.pluginPrefs.get(u'keepStats', False)
+		if self.keepStats:
+			self.nodeStats = self.load(self.pluginPrefs.get(u'nodeStats', self.store(dict()))) # see def emptyNodeStatList() for description
+			
+			# Update older versions of nodeStats
+			for l in self.nodeStats:
+				# after adding outNR
+				if len(l) == 9:
+					l = l[0:1] + [0] + l[2:]
+					
+		# Check plugin dependencies
+		self.checkDependantPlugins()
+
+	#####
+	# Check for dependant plugins, if they are enabled and correct version is installed etc.
+	#
+	def checkDependantPlugins(self):
+		self.logger.debug(u'Checking status of other plugins this plugin depends on')
+		
+		# [<plugin pref for enable of plugin>, <plugin id>, <Friendly name>, <min plugin version>]
+		pluginList = []
+			
+		for plug in pluginList:
+			
+			usePlugin = self.pluginPrefs.get(plug[0], False)
+			
+			self.logger.debug(u'Checking plugin "%s"' % plug[2])
+		
+			try:
+				if not usePlugin:
+					raise
+				try:
+					indigoPlug = indigo.server.getPlugin(plug[1])
+					if not indigoPlug.isRunning():
+						raise ImportError(u'Plugin "%s" is not running, please install/enable, and re-enable in %s plugin preferences' % (plug[2], self.pluginName))
+					if len(indigoPlug.pluginVersion) == 0 or indigoPlug.pluginVersion < plug[3]:
+						raise ImportError(u'Plugin "%s" version %s is less than %s requires (%s), please update the plugin.\nUse of this plugin in %s has been disabled' % (plug[2], indigoPlug.pluginVersion, self.pluginName, plug[3], self.pluginName))
+						
+					# Plugin specific checks:
+					if plug[1] == u'com.flyingdiver.indigoplugin.betteremail':
+						smtpDevId = self.pluginPrefs.get(u'plugin-betteremail-smtpdevice', u'')
+						if len(smtpDevId) == 0:
+							raise ImportError(u'You need to specify a valid "%s" SMTP device in %s plugin preferences' % plug[2], self.pluginName)
+						else:
+							try:
+								smtpDev = indigo.devices[int(smtpDevId)]
+								if not smtpDev.enabled:
+									raise
+							except:
+								raise ImportError(u'The specified "%s" SMTP device could not be loaded, please check\n%s plugin preferences and that the SMTP device is enabled' % (self.pluginName))					
+				except ImportError as e:
+					self.logger.error(e)
+					raise
+				except:
+					self.logger.error(u'Could not load plugin "%s". Please install and re-enable in %s plugin preferences' % (plug[2], self.pluginName))
+					raise
+			except:
+				# Common code for disabling use of the plugin
+				if usePlugin: # configured to use plugin, so some error happened
+					self.logger.debug(u'Disabling use of plugin "%s" in plugin prefs' % plug[2])
+					if len(indigoPlug.pluginSupportURL) > 0:
+						self.logger.info(u'"%s" support/install link: %s' % (plug[2], indigoPlug.pluginSupportURL))
+				else:
+					self.logger.debug(u'Not configured to use plugin "%s"' % plug[2])
+				self.pluginPrefs[plug[0]] = False
+				if plug[1] in self.dependantPlugins:
+					del self.dependantPlugins[plug[1]]
+			else:
+				# Plugin is successfully initialized, add to dict of enabled plugins
+				self.logger.debug(u'Plugin "%s" successfully checked' % plug[2])
+				self.dependantPlugins[plug[1]] = indigoPlug
+
 	########################################
 	# UI List generators and callbackmethods
 	########################################
