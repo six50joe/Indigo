@@ -3,6 +3,7 @@
 ####################
 
 import indigo
+import subprocess
 
 import os
 import sys
@@ -314,13 +315,9 @@ class Plugin(indigo.PluginBase):
 	########################################
 
 	def pingOtherHouse(self, action):
-                host = sys.argv[1]
-                NUM_RETRIES = int(sys.argv[2])
-                RETRY_WAIT  = int(sys.argv[3])
-
 		props = action.props
 
-                for i in range(0, props[u'numRetries']):
+                for i in range(0, int(props[u'numRetries'])):
                         rc = subprocess.call("/sbin/ping -t 1 -c 1 %s" \
                                              % (props[u'ipOrUrl'] ),
                                              shell=True,
@@ -331,5 +328,6 @@ class Plugin(indigo.PluginBase):
                                 return True
                         else:
                                 self.logger.debug("retry ping to %s" % props[u'ipOrUrl'])
-                                time.sleep(props[u'retrySecs'])
+                                time.sleep(int(props[u'retrySecs']))
+                return False
 					
