@@ -316,7 +316,7 @@ class Plugin(indigo.PluginBase):
 
 	def pingOtherHouse(self, action):
 		props = action.props
-                varName = u'resultVarName']
+                varName = props[u'resultVarName']
                 var = None
                 if len(varName) > 0:
                         var = indigo.variables[varNamne]
