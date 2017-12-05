@@ -14,6 +14,9 @@
 			<Field id="numRetries" type="textfield">
 				<Label>Number of retries:</Label>
 			</Field>
+			<Field id="resultVarName" type="textfield">
+				<Label>Name of variable to store result in:</Label>
+			</Field>
 		</ConfigUI>
 	</Action>
 </Actions>

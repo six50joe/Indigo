@@ -316,6 +316,10 @@ class Plugin(indigo.PluginBase):
 
 	def pingOtherHouse(self, action):
 		props = action.props
+                varName = u'resultVarName']
+                var = None
+                if len(varName) > 0:
+                        var = indigo.variables[varNamne]
 
                 for i in range(0, int(props[u'numRetries'])):
                         rc = subprocess.call("/sbin/ping -t 1 -c 1 %s" \
@@ -325,9 +329,14 @@ class Plugin(indigo.PluginBase):
 
                         if rc == 0:
                                 self.logger.debug("ping reached %s" % props[u'ipOrUrl'])
+                                if var:
+                                        indigo.variable.upateValue(var, value=unicode(True))
                                 return True
                         else:
                                 self.logger.debug("retry ping to %s" % props[u'ipOrUrl'])
                                 time.sleep(int(props[u'retrySecs']))
+
+                if  var:
+                        indigo.variable.upateValue(var, value=unicode(False))
                 return False
 					
