@@ -319,7 +319,7 @@ class Plugin(indigo.PluginBase):
                 varName = props[u'resultVarName']
                 var = None
                 if len(varName) > 0:
-                        var = indigo.variables[varNamne]
+                        var = indigo.variables[varName]
 
                 for i in range(0, int(props[u'numRetries'])):
                         rc = subprocess.call("/sbin/ping -t 1 -c 1 %s" \
