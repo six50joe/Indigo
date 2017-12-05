@@ -330,13 +330,13 @@ class Plugin(indigo.PluginBase):
                         if rc == 0:
                                 self.logger.debug("ping reached %s" % props[u'ipOrUrl'])
                                 if var:
-                                        indigo.variable.upateValue(var, value=unicode(True))
+                                        indigo.variable.updateValue(var, value=unicode(True))
                                 return True
                         else:
                                 self.logger.debug("retry ping to %s" % props[u'ipOrUrl'])
                                 time.sleep(int(props[u'retrySecs']))
 
                 if  var:
-                        indigo.variable.upateValue(var, value=unicode(False))
+                        indigo.variable.updateValue(var, value=unicode(False))
                 return False
 					
