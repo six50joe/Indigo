@@ -307,6 +307,27 @@ class Plugin(indigo.PluginBase):
 				self.logger.debug(u'Plugin "%s" successfully checked' % plug[2])
 				self.dependantPlugins[plug[1]] = indigoPlug
 
+        def ping(self, ipOrUrl):
+                rc = subprocess.call("/sbin/ping -t 1 -c 1 %s" \
+                                     % (ipOrUrl),
+                                     shell=True,
+                                     stdout=subprocess.PIPE)
+                if rc == 0:
+                        return True
+                else:
+                        return False
+
+	########################################
+        def getPresenceDeviceList(self, filter="",
+                                  valuesDict=None,
+                                  typeId="",
+                                  targetId=0):
+            list = []
+            for v in indigo.variables:
+                if v.name.startswith("S50_PRESDT"):
+                    list.append({'name' : v.name, 'value' : v.value})
+            return list
+    
 	########################################
 	# UI List generators and callbackmethods
 	########################################
@@ -322,12 +343,9 @@ class Plugin(indigo.PluginBase):
                         var = indigo.variables[varName]
 
                 for i in range(0, int(props[u'numRetries'])):
-                        rc = subprocess.call("/sbin/ping -t 1 -c 1 %s" \
-                                             % (props[u'ipOrUrl'] ),
-                                             shell=True,
-                                             stdout=subprocess.PIPE)
+                        reached = self.ping(props[u'ipOrUrl'])
 
-                        if rc == 0:
+                        if reached:
                                 self.logger.debug("ping reached %s" % props[u'ipOrUrl'])
                                 if var:
                                         indigo.variable.updateValue(var, value=unicode(True))
@@ -339,4 +357,29 @@ class Plugin(indigo.PluginBase):
                 if  var:
                         indigo.variable.updateValue(var, value=unicode(False))
                 return False
+
+        def checkDevicePresence(self):
+            devList = self.getPresenceDeviceList()
+            deviceReached = False
+            for d in devList:
+                reachable = self.ping(d['value'])
+                if not deviceReached and reachable:
+                    deviceReached = True
+                self.logger.debug("dev: %s: %s" % (d['name'], reachable))
+                varName = d['name'] + "_reached"
+                var = None
+                if varName not in indigo.variables:
+                    var = indigo.variable.create(varName, str(reachable))
+                else:
+                    var = indigo.variable.updateValue(varName, str(reachable))
+
+            presenceVarName = 'DevicesPresent'
+            if presenceVarName not in indigo.variables:
+                var = indigo.variable.create(presenceVarName, str(deviceReached))
+            else:
+                var = indigo.variable.updateValue(presenceVarName, str(deviceReached))
+            
+
+                
+                
 					
