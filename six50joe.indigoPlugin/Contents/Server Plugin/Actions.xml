@@ -19,4 +19,8 @@
 			</Field>
 		</ConfigUI>
 	</Action>
+	<Action id="checkDevicePresence">
+		<Name>Check Device Presence</Name>
+		<CallbackMethod>checkDevicePresence</CallbackMethod>
+	</Action>
 </Actions>
