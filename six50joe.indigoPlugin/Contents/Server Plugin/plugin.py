@@ -371,7 +371,7 @@ class Plugin(indigo.PluginBase):
                         indigo.variable.updateValue(var, value=unicode(False))
                 return False
 
-        def checkDevicePresence(self):
+        def checkDevicePresence(self, arg1=None):
             devList = self.getPresenceDevices()
             deviceReached = False
             for d in devList:
