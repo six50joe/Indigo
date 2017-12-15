@@ -17,6 +17,15 @@
 			<Field id="resultVarName" type="textfield">
 				<Label>Name of variable to store result in:</Label>
 			</Field>
+		</ConfigUI>>
+	</Action>
+	<Action id="managePresenceDevices">
+		<Name>Manage Presence Devices</Name>
+                <Label>Presence Devices:</Label>
+		<ConfigUI>
+			<Field id="presenceDeviceList" type="list">
+			  <List class="self" filter="" method="getPresenceDeviceList"/>
+			</Field>
 		</ConfigUI>
 	</Action>
 	<Action id="checkDevicePresence">

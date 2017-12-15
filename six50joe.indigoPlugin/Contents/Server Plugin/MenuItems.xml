@@ -11,6 +11,10 @@
 		<Name>Ping Other House...</Name>
 		<ConfigUI actionId="pingOtherHouse"/>
 	</MenuItem>
+	<MenuItem id="managePresenceDevices">
+		<Name>Manage Presence Devices</Name>
+		<ConfigUI actionId="managePresenceDevices"/>
+	</MenuItem>
 	<MenuItem id="checkDevicePresence">
 		<Name>Check Device Presence</Name>
 		<CallbackMethod>checkDevicePresence</CallbackMethod>

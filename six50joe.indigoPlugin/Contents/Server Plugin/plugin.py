@@ -318,15 +318,28 @@ class Plugin(indigo.PluginBase):
                         return False
 
 	########################################
-        def getPresenceDeviceList(self, filter="",
+        def getPresenceDevices(self, filter="",
                                   valuesDict=None,
                                   typeId="",
                                   targetId=0):
             list = []
             for v in indigo.variables:
-                if v.name.startswith("S50_PRESDT"):
+                if v.name.startswith("S50_PRESDT") \
+                 and not v.name.endswith("_reached"):
                     list.append({'name' : v.name, 'value' : v.value})
             return list
+
+	########################################
+        def getPresenceDeviceList(self, filter="",
+                                  valuesDict=None,
+                                  typeId="",
+                                  targetId=0):
+                devList = self.getPresenceDevices()
+                list = []
+                for dev in devList:
+                    list.append([dev['name'], dev['value']])
+                return list
+
     
 	########################################
 	# UI List generators and callbackmethods
@@ -359,7 +372,7 @@ class Plugin(indigo.PluginBase):
                 return False
 
         def checkDevicePresence(self):
-            devList = self.getPresenceDeviceList()
+            devList = self.getPresenceDevices()
             deviceReached = False
             for d in devList:
                 reachable = self.ping(d['value'])
