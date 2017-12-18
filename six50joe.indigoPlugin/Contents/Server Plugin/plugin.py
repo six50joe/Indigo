@@ -382,16 +382,15 @@ class Plugin(indigo.PluginBase):
                 varName = d['name'] + "_reached"
                 var = None
                 if varName not in indigo.variables:
-                    var = indigo.variable.create(varName, str(reachable))
+                    var = indigo.variable.create(varName, unicode(reachable))
                 else:
-                    var = indigo.variable.updateValue(varName, str(reachable))
+                    var = indigo.variable.updateValue(varName, unicode(reachable))
 
             presenceVarName = 'DevicesPresent'
             if presenceVarName not in indigo.variables:
-                var = indigo.variable.create(presenceVarName, str(deviceReached))
+                var = indigo.variable.create(presenceVarName, unicode(deviceReached))
             else:
-                var = indigo.variable.updateValue(presenceVarName, str(deviceReached))
-            
+                var = indigo.variable.updateValue(presenceVarName, unicode(deviceReached))
 
                 
                 
