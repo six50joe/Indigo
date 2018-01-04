@@ -32,4 +32,13 @@
 		<Name>Check Device Presence</Name>
 		<CallbackMethod>checkDevicePresence</CallbackMethod>
 	</Action>
+	<Action id="getPropaneLevel">
+		<Name>Get Propane Level</Name>
+		<CallbackMethod>getPropaneLevel</CallbackMethod>
+		<ConfigUI>
+			<Field id="testSensorVal" type="textfield" defaultValue="">
+				<Label>Test Sensor Value:</Label>
+			</Field>
+		</ConfigUI>>
+	</Action>
 </Actions>

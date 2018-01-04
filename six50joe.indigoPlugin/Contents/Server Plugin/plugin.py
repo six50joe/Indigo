@@ -9,6 +9,7 @@ import os
 import sys
 import logging
 import time
+import thread
 #import json, operator
 #import csv,codecs,cStringIO
 #from lib.csvUnicode import unicodeReader, unicodeWriter, UTF8Recoder
@@ -19,6 +20,12 @@ from collections import defaultdict
 from operator import itemgetter
 #from ghpu import GitHubPluginUpdater
 from ghpu import GitHubPluginUpdater
+from os.path import expanduser
+import datetime
+
+CONFIG_FILE_DIR           = expanduser("~") + "/Documents"
+RELAY_THRESHOLDS_FILENAME = "relay_thresholds.txt"
+PropaneThresholds = {}
 
 # Note the "indigo" module is automatically imported and made available inside
 # our global name space by the host process.
@@ -392,6 +399,105 @@ class Plugin(indigo.PluginBase):
             else:
                 var = indigo.variable.updateValue(presenceVarName, unicode(deviceReached))
 
+
+        def setRelay(self):
+            indigo.device.turnOn(relay, duration=100)
+
+        def iterate(self, iterable):
+            iterator = iter(iterable)
+            item = iterator.next()
+
+            for next_item in iterator:
+                yield item, next_item
+                item = next_item
+
+            
+            yield item, None
+    
+        def readPropaneThresholds(self):
+            global PropaneThresholds
+
+            PropaneThresholds = {}
+            
+            path = CONFIG_FILE_DIR + "/" + RELAY_THRESHOLDS_FILENAME
+            if os.path.exists(path):
+                inputFile = open(path, 'r')
+                for line in inputFile:
+                    (pct, thresh) = line.split(',')
+                    PropaneThresholds[pct] = thresh
+
+            #for key in sorted(PropaneThresholds.iterkeys()):
+            #    self.logger.debug("%s: %s" % (key, PropaneThresholds[key]))
+
+            for item, next_item in self.iterate(sorted(PropaneThresholds.iterkeys(), key=int)):
+                self.logger.debug("%s - next %s" % (str(item), str(next_item)))
+
+        def writePropaneThresholds(self):
+            path = CONFIG_FILE_DIR + "/" + RELAY_THRESHOLDS_FILENAME
+            if os.path.exists(path):
+                backup = path + "_" + datetime.datetime.today().strftime('%Y-%m-%d_%H:%M:%S')
+                os.rename(path, backup)
                 
-                
+            outFile = open(path, 'w')
+
+            for key in sorted(PropaneThresholds.iterkeys(), key=int):
+                outFile.write("%s,%s" % (key, PropaneThresholds[key]))
+
+        def getPropaneLevel(self, action):
+            props = action.props
+            testValStr = props[u'testSensorVal']
+            testVal = None
+            
+            if testValStr.isdigit():
+                testVal = int(testValStr)
+
+            self.readPropaneThresholds()
+
+            if testVal is None:
+                relay = indigo.devices["Propane - Relay Output"]
+                analog = indigo.devices["Propane - Analog Input"]
+
+                thread.start_new_thread(self.set_relay,())
+                indigo.activePlugin.sleep(1)
+                indigo.device.statusRequest(analog)
+                self.logger.info("sensor value is: " + str(analog.sensorValue))
+
+                # analog=2590
+
+                sensor = analog.sensorValue
+            else:
+                sensor = testVal
+
+            for pct, nextPct in self.iterate(sorted(PropaneThresholds.iterkeys(), key=int)):
+                self.logger.debug("%s - next %s" % (str(item), str(next_item)))
+                #                for t, threshold in enumerate(thresholds):
+                if PrpopaneThresholds[pct] <= sensor:
+                    if nextPct is None:
+                        # This reading is above the high
+
+                        level = "> %d%%" % (pct)
+                        break
+                    if sensor <= PropaneThresholds[nextPct]:
+                        # The reading is between two thresholds
+
+                        rangeBottom = PrpopaneThresholds[t]
+                        rangeTop = PrpopaneThresholds[t + 1]
+
+                        range = (rangeTop - rangeBottom)
+                        span = int(nextPct) - int(pct)
+                        increment = range / span
+
+                        calcPct = pct + ((sensor - rangeBottom) / increment)
+                        level = "%d%%" % (calcPct)
+                        break
+                else:
+                    # Reading is below the lowest
+                    level = "< %d%%" % (pct)
+
+            propaneVar = indigo.variables["PropaneLevel"]
+            indigo.variable.updateValue(propaneVar, str(pct))
+            propaneStrVar = indigo.variables["PropaneLevelStr"]
+            indigo.variable.updateValue(propaneStrVar, level)
+
+            self.logger.debug("Propane level is %s" % propaneStrVar)
 					

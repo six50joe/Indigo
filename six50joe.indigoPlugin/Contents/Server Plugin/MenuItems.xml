@@ -19,6 +19,10 @@
 		<Name>Check Device Presence</Name>
 		<CallbackMethod>checkDevicePresence</CallbackMethod>
 	</MenuItem>
+	<MenuItem id="getPropaneLevel">
+		<Name>Get Propane Level</Name>
+		<CallbackMethod>getPropaneLevel</CallbackMethod>
+	</MenuItem>
 	<MenuItem id="separator" />
 	<MenuItem id="checkPluginUpdates">
 		<Name>Check for plugin updates</Name>
