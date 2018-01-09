@@ -424,7 +424,7 @@ class Plugin(indigo.PluginBase):
                 inputFile = open(path, 'r')
                 for line in inputFile:
                     (pct, thresh) = line.split(',')
-                    PropaneThresholds[pct] = thresh
+                    PropaneThresholds[pct] = thresh.strip()
 
             #for key in sorted(PropaneThresholds.iterkeys()):
             #    self.logger.debug("%s: %s" % (key, PropaneThresholds[key]))
@@ -448,7 +448,7 @@ class Plugin(indigo.PluginBase):
             outFile = open(path, 'w')
 
             for key in sorted(PropaneThresholds.iterkeys(), key=int):
-                outFile.write("%s,%s" % (key, PropaneThresholds[key]))
+                outFile.write("%s,%s\n" % (key, PropaneThresholds[key]))
 
         def getPropaneSensorReading(self):
             relay = indigo.devices["Propane - Relay Output"]
@@ -577,4 +577,4 @@ class Plugin(indigo.PluginBase):
                 self.logger.debug("PRP: %s %s(%d)" % (prefix, item, int(PropaneThresholds[item])))
                 
 
-            
+            self.writePropaneThresholds()
