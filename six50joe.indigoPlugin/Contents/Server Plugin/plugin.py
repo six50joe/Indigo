@@ -429,7 +429,14 @@ class Plugin(indigo.PluginBase):
             #for key in sorted(PropaneThresholds.iterkeys()):
             #    self.logger.debug("%s: %s" % (key, PropaneThresholds[key]))
 
+            lastVal = 0
             for item, next_item in self.iterate(sorted(PropaneThresholds.iterkeys(), key=int)):
+                if next_item is not None and \
+                    PropaneThresholds[item] > PropaneThresholds[next_item]:
+                    self.logger.warn("WARNING: propane thresholds out of order: %s(%d) < %s(%d)" \
+                                     % (item, int(PropaneThresholds[item]),
+                                        next_item, int(PropaneThresholds[next_item])))
+                lastVal = PropaneThresholds[item]
                 self.logger.debug("%s - next %s" % (str(item), str(next_item)))
 
         def writePropaneThresholds(self):
@@ -443,6 +450,17 @@ class Plugin(indigo.PluginBase):
             for key in sorted(PropaneThresholds.iterkeys(), key=int):
                 outFile.write("%s,%s" % (key, PropaneThresholds[key]))
 
+        def getPropaneSensorReading(self):
+            relay = indigo.devices["Propane - Relay Output"]
+            analog = indigo.devices["Propane - Analog Input"]
+
+            thread.start_new_thread(self.set_relay,())
+            indigo.activePlugin.sleep(1)
+            indigo.device.statusRequest(analog)
+            self.logger.info("sensor value is: " + str(analog.sensorValue))
+            return analog.sensorValue
+            
+
         def getPropaneLevel(self, action):
             props = action.props
             testValStr = props[u'testSensorVal']
@@ -453,51 +471,110 @@ class Plugin(indigo.PluginBase):
 
             self.readPropaneThresholds()
 
+            sensor = None
+
             if testVal is None:
-                relay = indigo.devices["Propane - Relay Output"]
-                analog = indigo.devices["Propane - Analog Input"]
-
-                thread.start_new_thread(self.set_relay,())
-                indigo.activePlugin.sleep(1)
-                indigo.device.statusRequest(analog)
-                self.logger.info("sensor value is: " + str(analog.sensorValue))
-
-                # analog=2590
-
-                sensor = analog.sensorValue
+                sensor = self.getPropaneSensorReading()
             else:
                 sensor = testVal
 
+            firstThreshold=True
             for pct, nextPct in self.iterate(sorted(PropaneThresholds.iterkeys(), key=int)):
-                self.logger.debug("%s - next %s" % (str(item), str(next_item)))
+                thresh = int(PropaneThresholds[pct])
+                nextThresh = -1
+                if nextPct:
+                    nextThresh = int(PropaneThresholds[nextPct])
+                self.logger.debug("%s(%d) - next %s(%d)" % (str(pct),
+                                                            thresh,
+                                                            str(nextPct), 
+                                                            nextThresh))
                 #                for t, threshold in enumerate(thresholds):
-                if PrpopaneThresholds[pct] <= sensor:
+                calcPct = None
+                if thresh <= sensor:
                     if nextPct is None:
                         # This reading is above the high
 
-                        level = "> %d%%" % (pct)
+                        level = "> %s%%" % (pct)
+                        calcPct = pct
                         break
-                    if sensor <= PropaneThresholds[nextPct]:
+                    if sensor <= nextThresh:
                         # The reading is between two thresholds
 
-                        rangeBottom = PrpopaneThresholds[t]
-                        rangeTop = PrpopaneThresholds[t + 1]
+                        rangeBottom = thresh
+                        rangeTop = nextThresh
 
                         range = (rangeTop - rangeBottom)
                         span = int(nextPct) - int(pct)
                         increment = range / span
-
-                        calcPct = pct + ((sensor - rangeBottom) / increment)
+                        calcPct = int(pct) + ((sensor - rangeBottom) / increment)
+                        self.logger.debug("range: %d span: %d increment: %d calcPct: %d" \
+                                          % (range, span, increment, calcPct))
                         level = "%d%%" % (calcPct)
                         break
                 else:
-                    # Reading is below the lowest
-                    level = "< %d%%" % (pct)
+                    if firstThreshold:
+                        # Reading is below the lowest
+                        level = "< %s%%" % (pct)
+                        calcPct = pct
+                        break
+                firstThreshold = False
 
             propaneVar = indigo.variables["PropaneLevel"]
-            indigo.variable.updateValue(propaneVar, str(pct))
+            indigo.variable.updateValue(propaneVar, str(calcPct))
             propaneStrVar = indigo.variables["PropaneLevelStr"]
             indigo.variable.updateValue(propaneStrVar, level)
 
-            self.logger.debug("Propane level is %s" % propaneStrVar)
+            self.logger.debug("Propane level is %s" % level)
 					
+        def calibratePropaneLevel(self, action):
+            props = action.props
+            gaugePct = int(props[u'gaugePct'])
+            self.readPropaneThresholds()
+
+            testValStr = props[u'testSensorVal']
+            testVal = None
+            
+            if testValStr.isdigit():
+                testVal = int(testValStr)
+
+            sensor = None
+            if testVal is None:
+                sensor = self.getPropaneSensorReading()
+            else:
+                sensor = testVal
+
+            # Insert the new reading into the list, replacing the
+            # cuyrrent pct reading if it already exists
+            PropaneThresholds[str(gaugePct)] = sensor
+            
+
+            # Now, iterate through the list and remove entries that
+            # cross over the new threshold out of order
+            toRemove = []
+            firstThreshold = True
+            for pct, nextPct in self.iterate(sorted(PropaneThresholds.iterkeys(), key=int)):
+                thresh = int(PropaneThresholds[pct])
+
+                if int(pct) < gaugePct and thresh > sensor:
+                    toRemove.append(pct)
+                    self.logger.debug("Existing threshold %d for %d%% is higher than new threshold %d, at %d%%, removing existing" \
+                                          % (thresh, int(pct), sensor, gaugePct))
+
+                if int(pct) > gaugePct and thresh < sensor:
+                    toRemove.append(pct)
+                    self.logger.debug("Existing threshold %d for %d%% is lower than new threshold %d, at %d%%, removing existing" \
+                                          % (thresh, int(pct), sensor, gaugePct))
+
+            for pct in toRemove:
+                del PropaneThresholds[pct]
+
+            self.logger.info("After calibration:")
+            for item, next_item in self.iterate(sorted(PropaneThresholds.iterkeys(), key=int)):
+                prefix = ""
+                if int(item) == gaugePct:
+                    prefix = "NEW--> "
+
+                self.logger.debug("PRP: %s %s(%d)" % (prefix, item, int(PropaneThresholds[item])))
+                
+
+            

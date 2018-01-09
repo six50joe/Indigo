@@ -35,10 +35,25 @@
 	<Action id="getPropaneLevel">
 		<Name>Get Propane Level</Name>
 		<CallbackMethod>getPropaneLevel</CallbackMethod>
+        <Label>If testing, enter a value otherwise leave alone</Label>
 		<ConfigUI>
 			<Field id="testSensorVal" type="textfield" defaultValue="">
-				<Label>Test Sensor Value:</Label>
+				<Label>Sensor value:</Label>
 			</Field>
-		</ConfigUI>>
+		</ConfigUI>
+	</Action>
+	<Action id="calibratePropaneLevel">
+		<Name>Calibrate Propane Level</Name>
+		<CallbackMethod>calibratePropaneLevel</CallbackMethod>
+        <Label>If testing, enter a test sensor value otherwise leave alone</Label>
+		<ConfigUI>
+			<Field id="gaugePct" type="textfield" defaultValue="">
+				<Label>Gauge Percent Reading:</Label>
+			</Field>
+			<Field id="testSensorVal" type="textfield" defaultValue="">
+				<Label>Sensor value:</Label>
+			</Field>
+		</ConfigUI>
 	</Action>
 </Actions>
+

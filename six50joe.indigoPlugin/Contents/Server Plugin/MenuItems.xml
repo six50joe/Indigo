@@ -21,7 +21,11 @@
 	</MenuItem>
 	<MenuItem id="getPropaneLevel">
 		<Name>Get Propane Level</Name>
-		<CallbackMethod>getPropaneLevel</CallbackMethod>
+		<ConfigUI actionId="getPropaneLevel"/>
+	</MenuItem>
+	<MenuItem id="calibratePropaneLevel">
+		<Name>Calibrate Propane Level</Name>
+		<ConfigUI actionId="calibratePropaneLevel"/>
 	</MenuItem>
 	<MenuItem id="separator" />
 	<MenuItem id="checkPluginUpdates">
