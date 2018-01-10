@@ -502,7 +502,10 @@ class Plugin(indigo.PluginBase):
 
                         range = (rangeTop - rangeBottom)
                         span = int(nextPct) - int(pct)
-                        increment = range / span
+                        increment = 1
+                        if range > span:
+                            increment = range / span
+                            
                         calcPct = int(pct) + ((sensor - rangeBottom) / increment)
                         self.logger.debug("range: %d span: %d increment: %d calcPct: %d" \
                                           % (range, span, increment, calcPct))
