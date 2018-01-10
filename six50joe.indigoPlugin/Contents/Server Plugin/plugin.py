@@ -400,9 +400,6 @@ class Plugin(indigo.PluginBase):
                 var = indigo.variable.updateValue(presenceVarName, unicode(deviceReached))
 
 
-        def setRelay(self):
-            indigo.device.turnOn(relay, duration=100)
-
         def iterate(self, iterable):
             iterator = iter(iterable)
             item = iterator.next()
@@ -454,7 +451,7 @@ class Plugin(indigo.PluginBase):
             relay = indigo.devices["Propane - Relay Output"]
             analog = indigo.devices["Propane - Analog Input"]
 
-            thread.start_new_thread(self.set_relay,())
+            indigo.device.turnOn(relay, duration=100)
             indigo.activePlugin.sleep(1)
             indigo.device.statusRequest(analog)
             self.logger.info("sensor value is: " + str(analog.sensorValue))
