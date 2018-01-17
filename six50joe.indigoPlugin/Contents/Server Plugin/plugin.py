@@ -22,6 +22,9 @@ from operator import itemgetter
 from ghpu import GitHubPluginUpdater
 from os.path import expanduser
 import datetime
+import datetime
+import dateutil.relativedelta
+import re
 
 CONFIG_FILE_DIR           = expanduser("~") + "/Documents"
 RELAY_THRESHOLDS_FILENAME = "relay_thresholds.txt"
@@ -439,7 +442,7 @@ class Plugin(indigo.PluginBase):
         def writePropaneThresholds(self):
             path = CONFIG_FILE_DIR + "/" + RELAY_THRESHOLDS_FILENAME
             if os.path.exists(path):
-                backup = path + "_" + datetime.datetime.today().strftime('%Y-%m-%d_%H:%M:%S')
+                backup = path + "_" + datetime.datetime.today().strftime('%Y-%mvb-%d_%H:%M:%S')
                 os.rename(path, backup)
                 
             outFile = open(path, 'w')
@@ -464,7 +467,7 @@ class Plugin(indigo.PluginBase):
             testVal = None
             
             if testValStr.isdigit():
-                testVal = int(testValStr)
+                testVal = int(float(testValStr))
 
             self.readPropaneThresholds()
 
@@ -477,10 +480,10 @@ class Plugin(indigo.PluginBase):
 
             firstThreshold=True
             for pct, nextPct in self.iterate(sorted(PropaneThresholds.iterkeys(), key=int)):
-                thresh = int(PropaneThresholds[pct])
+                thresh = int(float(PropaneThresholds[pct]))
                 nextThresh = -1
                 if nextPct:
-                    nextThresh = int(PropaneThresholds[nextPct])
+                    nextThresh = int(float(PropaneThresholds[nextPct]))
                 self.logger.debug("%s(%d) - next %s(%d)" % (str(pct),
                                                             thresh,
                                                             str(nextPct), 
@@ -504,10 +507,10 @@ class Plugin(indigo.PluginBase):
                         span = int(nextPct) - int(pct)
                         increment = 1
                         if range > span:
-                            increment = range / span
+                            increment = float(range) / float(span)
                             
                         calcPct = int(pct) + ((sensor - rangeBottom) / increment)
-                        self.logger.debug("range: %d span: %d increment: %d calcPct: %d" \
+                        self.logger.debug("range: %d span: %d increment: %f calcPct: %d" \
                                           % (range, span, increment, calcPct))
                         level = "%d%%" % (calcPct)
                         break
@@ -524,7 +527,7 @@ class Plugin(indigo.PluginBase):
             propaneStrVar = indigo.variables["PropaneLevelStr"]
             indigo.variable.updateValue(propaneStrVar, level)
 
-            self.logger.debug("Propane level is %s" % level)
+            self.logger.info("Propane level is %s" % level)
 					
         def calibratePropaneLevel(self, action):
             props = action.props
@@ -557,12 +560,12 @@ class Plugin(indigo.PluginBase):
 
                 if int(pct) < gaugePct and thresh > sensor:
                     toRemove.append(pct)
-                    self.logger.debug("Existing threshold %d for %d%% is higher than new threshold %d, at %d%%, removing existing" \
+                    self.logger.info("Existing threshold %d for %d%% is higher than new threshold %d, at %d%%, removing existing" \
                                           % (thresh, int(pct), sensor, gaugePct))
 
                 if int(pct) > gaugePct and thresh < sensor:
                     toRemove.append(pct)
-                    self.logger.debug("Existing threshold %d for %d%% is lower than new threshold %d, at %d%%, removing existing" \
+                    self.logger.info("Existing threshold %d for %d%% is lower than new threshold %d, at %d%%, removing existing" \
                                           % (thresh, int(pct), sensor, gaugePct))
 
             for pct in toRemove:
@@ -574,7 +577,61 @@ class Plugin(indigo.PluginBase):
                 if int(item) == gaugePct:
                     prefix = "NEW--> "
 
-                self.logger.debug("PRP: %s %s(%d)" % (prefix, item, int(PropaneThresholds[item])))
-                
+                self.logger.info("PRP: %s %s(%d)" % (prefix, item, int(PropaneThresholds[item])))
 
             self.writePropaneThresholds()
+
+        def archivePriorMonthLogs(self):
+            
+            var = indigo.variables['LogArchiveDir']
+
+            if not var:
+                self.logger.error("LogArchiveDir variable not set")
+                return
+
+            archiveDir = var.value
+        
+            var = indigo.variables['LogDir']
+
+            if not var:
+                self.logger.error("LogDir variable not set")
+                return
+
+            logDir = var.value
+
+            dtNow = datetime.datetime.now()
+            dtLastMonth = dtNow + dateutil.relativedelta.relativedelta(months=-1)
+     
+            # dtMatch = "%4d-%02d.*Events.txt" % (dtLastMonth.year, dtLastMonth.day)
+
+            # files = [f for f in os.listdir(logDir) if re.match(dtMatch, f)]
+
+            # for f in files:
+                # self.logger.debug(f)
+
+            yearDir = "%s/%4d" % (archiveDir, dtLastMonth.year)
+
+            self.logger.debug("YearDir=%s" % yearDir)
+            if (not os.path.isdir(yearDir)):
+                os.mkdir(yearDir)
+
+            yearDir    = yearDir.replace(" ","\ ")
+            logDir     = logDir.replace(" ","\ ")
+
+            tarPath = "%s/%s.tar" % (yearDir, dtLastMonth.strftime("%Y-%b"))
+            
+            tarcmd = "cd %s;tar -cvf %s %4d-%02d*" \
+                      % (logDir,
+                         tarPath,
+                         dtLastMonth.year,
+                         dtLastMonth.month)
+
+            self.logger.debug(tarcmd)
+
+            rc = subprocess.call(tarcmd, shell=True, stdout=subprocess.PIPE)
+
+            gzcmd = "gzip %s" % tarPath
+
+            rc = subprocess.call(gzcmd, shell=True, stdout=subprocess.PIPE)
+                       
+

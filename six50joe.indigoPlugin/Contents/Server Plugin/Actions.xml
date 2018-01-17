@@ -1,6 +1,10 @@
 <?xml version="1.0"?>
 <Actions>
     <SupportURL>https://github.com/six50joe/Indigo</SupportURL>
+	<Action id="archiveLogs">
+		<Name>Archive prior month logs</Name>
+		<CallbackMethod>archivePriorMonthLogs</CallbackMethod>
+	</Action>
 	<Action id="pingOtherHouse">
 		<Name>Ping other house</Name>
 		<CallbackMethod>pingOtherHouse</CallbackMethod>
