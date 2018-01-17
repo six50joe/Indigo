@@ -615,11 +615,18 @@ class Plugin(indigo.PluginBase):
             if (not os.path.isdir(yearDir)):
                 os.mkdir(yearDir)
 
-            yearDir    = yearDir.replace(" ","\ ")
+            tarPath = "%s/%s.tar" % (yearDir, dtLastMonth.strftime("%Y-%b"))
+            tarPathGz = "%s.gz" % tarPath
+
+            if (os.path.exists(tarPathGz)):
+                self.logger.info("Last month archive already created; no action taken")
+                return
+            else:
+                self.logger.info("Creating last month archive: %s" % tarPath)
+            
+            tarPath    = tarPath.replace(" ","\ ")
             logDir     = logDir.replace(" ","\ ")
 
-            tarPath = "%s/%s.tar" % (yearDir, dtLastMonth.strftime("%Y-%b"))
-            
             tarcmd = "cd %s;tar -cvf %s %4d-%02d*" \
                       % (logDir,
                          tarPath,
