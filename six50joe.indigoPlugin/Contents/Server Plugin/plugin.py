@@ -531,7 +531,9 @@ class Plugin(indigo.PluginBase):
 					
         def calibratePropaneLevel(self, action):
             props = action.props
-            gaugePct = int(props[u'gaugePct'])
+
+            gaugePctInput = props[u'gaugePct']
+
             self.readPropaneThresholds()
 
             testValStr = props[u'testSensorVal']
@@ -539,6 +541,14 @@ class Plugin(indigo.PluginBase):
             
             if testValStr.isdigit():
                 testVal = int(testValStr)
+
+            gaugePct = None
+            if gaugePctInput.isdigit():
+                gaugePct = int(props[u'gaugePct'])
+            else:
+                var = indigo.variables['PropaneCalibrationPct']
+                gaugePct = int(var.value)
+                self.logger.info("Propane calibratrion pct input is: %d" % gaugePct)
 
             sensor = None
             if testVal is None:
@@ -556,7 +566,8 @@ class Plugin(indigo.PluginBase):
             toRemove = []
             firstThreshold = True
             for pct, nextPct in self.iterate(sorted(PropaneThresholds.iterkeys(), key=int)):
-                thresh = int(PropaneThresholds[pct])
+
+                thresh = int(float(PropaneThresholds[pct]))
 
                 if int(pct) < gaugePct and thresh > sensor:
                     toRemove.append(pct)
@@ -577,7 +588,7 @@ class Plugin(indigo.PluginBase):
                 if int(item) == gaugePct:
                     prefix = "NEW--> "
 
-                self.logger.info("PRP: %s %s(%d)" % (prefix, item, int(PropaneThresholds[item])))
+                self.logger.info("PRP: %s %s(%d)" % (prefix, item, int(float(PropaneThresholds[item]))))
 
             self.writePropaneThresholds()
 
