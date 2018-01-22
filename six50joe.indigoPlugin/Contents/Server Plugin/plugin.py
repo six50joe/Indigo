@@ -478,51 +478,64 @@ class Plugin(indigo.PluginBase):
             else:
                 sensor = testVal
 
-            firstThreshold=True
-            for pct, nextPct in self.iterate(sorted(PropaneThresholds.iterkeys(), key=int)):
-                thresh = int(float(PropaneThresholds[pct]))
-                nextThresh = -1
-                if nextPct:
-                    nextThresh = int(float(PropaneThresholds[nextPct]))
-                self.logger.debug("%s(%d) - next %s(%d)" % (str(pct),
-                                                            thresh,
-                                                            str(nextPct), 
-                                                            nextThresh))
-                #                for t, threshold in enumerate(thresholds):
-                calcPct = None
-                if thresh <= sensor:
-                    if nextPct is None:
-                        # This reading is above the high
-
-                        level = "> %s%%" % (pct)
-                        calcPct = pct
-                        break
-                    if sensor <= nextThresh:
-                        # The reading is between two thresholds
-
-                        rangeBottom = thresh
-                        rangeTop = nextThresh
-
-                        range = (rangeTop - rangeBottom)
-                        span = int(nextPct) - int(pct)
-                        increment = 1
-                        if range > span:
-                            increment = float(range) / float(span)
-                            
-                        calcPct = int(pct) + ((sensor - rangeBottom) / increment)
-                        self.logger.debug("range: %d span: %d increment: %f calcPct: %d" \
-                                          % (range, span, increment, calcPct))
-                        level = "%d%%" % (calcPct)
-                        break
-                else:
-                    if firstThreshold:
-                        # Reading is below the lowest
-                        level = "< %s%%" % (pct)
-                        calcPct = pct
-                        break
-                firstThreshold = False
-
             propaneVar = indigo.variables["PropaneLevel"]
+            prevPct = int(float(propaneVar.value))
+
+            retry = 0
+
+            while retry < 3:
+                    firstThreshold=True
+                    for pct, nextPct in self.iterate(sorted(PropaneThresholds.iterkeys(), key=int)):
+                        thresh = int(float(PropaneThresholds[pct]))
+                        nextThresh = -1
+                        if nextPct:
+                            nextThresh = int(float(PropaneThresholds[nextPct]))
+                        self.logger.debug("%s(%d) - next %s(%d)" % (str(pct),
+                                                                    thresh,
+                                                                    str(nextPct), 
+                                                                    nextThresh))
+                        #                for t, threshold in enumerate(thresholds):
+                        calcPct = None
+                        if thresh <= sensor:
+                            if nextPct is None:
+                                # This reading is above the high
+
+                                level = "> %s%%" % (pct)
+                                calcPct = pct
+                                break
+                            if sensor <= nextThresh:
+                                # The reading is between two thresholds
+
+                                rangeBottom = thresh
+                                rangeTop = nextThresh
+
+                                range = (rangeTop - rangeBottom)
+                                span = int(nextPct) - int(pct)
+                                increment = 1
+                                if range > span:
+                                    increment = float(range) / float(span)
+
+                                calcPct = int(pct) + ((sensor - rangeBottom) / increment)
+                                self.logger.debug("range: %d span: %d increment: %f calcPct: %d" \
+                                                  % (range, span, increment, calcPct))
+                                level = "%d%%" % (calcPct)
+                                break
+                        else:
+                            if firstThreshold:
+                                # Reading is below the lowest
+                                level = "< %s%%" % (pct)
+                                calcPct = pct
+                                break
+                        firstThreshold = False
+
+                    delta = prevPct - int(pct)
+                    if delta <= 10:
+                        break
+                    # Might have been a bad reading; retry
+                    time.sleep(2)
+                    retry += 1
+                    indigo.server.log("possible bad value, retrying: " + str(pct))
+        
             indigo.variable.updateValue(propaneVar, str(calcPct))
             propaneStrVar = indigo.variables["PropaneLevelStr"]
             indigo.variable.updateValue(propaneStrVar, level)
