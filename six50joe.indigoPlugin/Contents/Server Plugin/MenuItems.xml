@@ -7,6 +7,10 @@
 -->
 <MenuItems>
     <SupportURL>https://github.com/six50joe/Indigo</SupportURL>
+	<MenuItem id="mailRecentLogs">
+		<Name>Mail Recent Logs</Name>
+		<CallbackMethod>mailRecentLogs</CallbackMethod>
+	</MenuItem>
 	<MenuItem id="archiveLogs">
 		<Name>Archive Logs</Name>
 		<CallbackMethod>archivePriorMonthLogs</CallbackMethod>

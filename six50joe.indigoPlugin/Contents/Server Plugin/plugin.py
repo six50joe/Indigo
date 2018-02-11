@@ -664,5 +664,99 @@ class Plugin(indigo.PluginBase):
             gzcmd = "gzip %s" % tarPath
 
             rc = subprocess.call(gzcmd, shell=True, stdout=subprocess.PIPE)
+
+        def mailAttachment(self, title, path):
+                applescript='''
+                tell application "Finder"
+	        set folderPath to folder "Macintosh HD:Users:six50joe:Google Drive:Home:Lake House:Indigo Logs:"
+	        set theFile to file "indigo_logs.tar" in folderPath as alias
+	        set fileName to name of theFile
+                end tell
+                set theSubject to fileName
+                set theBody to "Indigo logs collection: " & fileName
+                set theAddress to "six50joe@gmail.com"
+                set theAttachment to theFile
+                set theSender to "six50joe@gmail.com"
+
+                tell application "Mail"
+	        set theNewMessage to make new outgoing message with properties {subject:theSubject, content:theBody, visible:false}
+	        tell theNewMessage
+		set visibile to true
+		set sender to theSender
+		make new to recipient at end of to recipients with properties {address:theAddress}
+		try
+	           make new attachment with properties {file name:theAttachment} at after the last word of the last paragraph
+	           set message_attachment to 0
+                   on error errmess -- oops
+                   log errmess -- log the error
+		   set message_attachment to 1
+		end try
+                delay 15
+		send
+	        end tell
+                end tell
+                '''
+                args = [item for x in [("-e",l.strip()) for l in applescript.split('\n') if l.strip() != ''] for item in x]
+
+                self.logger.debug(args)
+                proc = subprocess.Popen(["osascript"] + args ,stdout=subprocess.PIPE )
+                out = proc.stdout.read().strip()
+                self.logger.debug(str(out))
+                return out
                        
+        def mailRecentLogs(self):
+            var = indigo.variables['LogDir']
+
+            if not var:
+                self.logger.error("LogDir variable not set")
+                return
+
+            logDir = var.value
+
+            var = indigo.variables['LogArchiveDir']
+
+            if not var:
+                self.logger.error("LogArchiveDir variable not set")
+                return
+
+            archiveDir = var.value
+
+            dtNow = datetime.datetime.now()
+            priorDate = dtNow + dateutil.relativedelta.relativedelta(days=-14)
+            self.logger.debug("Prior date=%s" % (priorDate))
+
+            files = [f for f in os.listdir(logDir) if re.match(".*Events.txt", f)]
+
+            arcName = "indigo_logs.tar"
+
+            #archiveDir = archiveDir.replace(" ","\ ")
+            # cmd = "tar -cvf %s/%s" % (archiveDir, arcName)
+            # self.logger.debug(cmd)
+            # rc = subprocess.call(cmd,
+            #                      shell=True,
+            #                      stdout=subprocess.PIPE)
+            # if rc != 0:
+            #     self.logger.error("Couldn't create log archive file")
+                
+            for f in files:
+                m = re.match("(\d\d\d\d)-(\d\d)-(\d\d).*", f)
+
+                if m:
+                    year  = int(m.group(1))
+                    month = int(m.group(2))
+                    day   = int(m.group(3))
+
+                    fdt = datetime.datetime(year=year, month=month, day=day)
+                    self.logger.debug("Year=%d month=%d day=%d" % (year, month, day))
+                    if fdt > priorDate:
+                        cmd = "tar -rvf \"%s/%s\" \"%s/%s\"" % (archiveDir, arcName, logDir, f)
+                        #self.logger.debug(cmd)
+                        rc = subprocess.call(cmd,
+                                             shell=True,
+                                             stdout=subprocess.PIPE)
+                        if rc != 0:
+                            self.logger.error("Couldn't update log archive file")
+
+            self.mailAttachment("Recent Indigo Logs", archiveDir)
+                        
 
