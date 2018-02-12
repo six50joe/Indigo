@@ -665,10 +665,16 @@ class Plugin(indigo.PluginBase):
 
             rc = subprocess.call(gzcmd, shell=True, stdout=subprocess.PIPE)
 
-        def mailAttachment(self, title, path):
+        def mailAttachment(self, title, volume, path):
+                path = path.replace("/", ":")
+                if not path.startswith(":"):
+                    path = ":" + path
+                if not path.endswith(":"):
+                    path = path + ":"
+                path = volume + path
                 applescript='''
                 tell application "Finder"
-	        set folderPath to folder "Macintosh HD:Users:six50joe:Google Drive:Home:Lake House:Indigo Logs:"
+	        set folderPath to folder "%s"
 	        set theFile to file "indigo_logs.tar" in folderPath as alias
 	        set fileName to name of theFile
                 end tell
@@ -695,7 +701,7 @@ class Plugin(indigo.PluginBase):
 		send
 	        end tell
                 end tell
-                '''
+                ''' % path
                 args = [item for x in [("-e",l.strip()) for l in applescript.split('\n') if l.strip() != ''] for item in x]
 
                 self.logger.debug(args)
@@ -738,6 +744,8 @@ class Plugin(indigo.PluginBase):
             # if rc != 0:
             #     self.logger.error("Couldn't create log archive file")
                 
+            if (os.path.exists("%s/%s" % (archiveDir, arcName))):
+                os.remove("%s/%s" % (archiveDir, arcName))
             for f in files:
                 m = re.match("(\d\d\d\d)-(\d\d)-(\d\d).*", f)
 
@@ -749,14 +757,14 @@ class Plugin(indigo.PluginBase):
                     fdt = datetime.datetime(year=year, month=month, day=day)
                     self.logger.debug("Year=%d month=%d day=%d" % (year, month, day))
                     if fdt > priorDate:
-                        cmd = "tar -rvf \"%s/%s\" \"%s/%s\"" % (archiveDir, arcName, logDir, f)
-                        #self.logger.debug(cmd)
+                        cmd = "cd \"%s\";tar -rvf \"%s/%s\" \"%s\"" % (logDir, archiveDir, arcName, f)
+                        # self.logger.debug(cmd)
                         rc = subprocess.call(cmd,
                                              shell=True,
                                              stdout=subprocess.PIPE)
                         if rc != 0:
                             self.logger.error("Couldn't update log archive file")
 
-            self.mailAttachment("Recent Indigo Logs", archiveDir)
+            self.mailAttachment("Recent Indigo Logs", "Macintosh HD", archiveDir)
                         
 
