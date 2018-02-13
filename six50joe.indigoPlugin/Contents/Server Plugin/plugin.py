@@ -442,7 +442,7 @@ class Plugin(indigo.PluginBase):
         def writePropaneThresholds(self):
             path = CONFIG_FILE_DIR + "/" + RELAY_THRESHOLDS_FILENAME
             if os.path.exists(path):
-                backup = path + "_" + datetime.datetime.today().strftime('%Y-%mvb-%d_%H:%M:%S')
+                backup = path + "_" + datetime.datetime.today().strftime('%Y-%m-%d_%H:%M:%S')
                 os.rename(path, backup)
                 
             outFile = open(path, 'w')
@@ -565,7 +565,10 @@ class Plugin(indigo.PluginBase):
 
             sensor = None
             if testVal is None:
-                sensor = self.getPropaneSensorReading()
+                # Get multiple readings, in case 1st one is bad
+                for x in range(1, 3):
+                    sensor = self.getPropaneSensorReading()
+                    time.sleep(3)
             else:
                 sensor = testVal
 
