@@ -381,7 +381,7 @@ class Plugin(indigo.PluginBase):
                         indigo.variable.updateValue(var, value=unicode(False))
                 return False
 
-        def checkDevicePresence(self, arg1=None):
+        def checkDevicePresence(self, action):
             devList = self.getPresenceDevices()
             deviceReached = False
             for d in devList:
@@ -608,7 +608,7 @@ class Plugin(indigo.PluginBase):
 
             self.writePropaneThresholds()
 
-        def archivePriorMonthLogs(self):
+        def archivePriorMonthLogs(self, action):
             
             var = indigo.variables['LogArchiveDir']
 
@@ -713,7 +713,7 @@ class Plugin(indigo.PluginBase):
                 self.logger.debug(str(out))
                 return out
                        
-        def mailRecentLogs(self):
+        def mailRecentLogs(self, action):
             var = indigo.variables['LogDir']
 
             if not var:
