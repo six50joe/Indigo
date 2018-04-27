@@ -25,7 +25,7 @@
 			<Field id="resultVarName" type="textfield">
 				<Label>Name of variable to store result in:</Label>
 			</Field>
-		</ConfigUI>>
+		</ConfigUI>
 	</Action>
 	<Action id="managePresenceDevices">
 		<Name>Manage Presence Devices</Name>
