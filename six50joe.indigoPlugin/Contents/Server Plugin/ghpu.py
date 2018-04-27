@@ -127,8 +127,8 @@ class GitHubPluginUpdater(object):
 
         return (limit, remain, resetAt)
 
-   def _GET(self, requestPath):
-      self.logger.debug('GET %s' % requestPath)
+    def _GET(self, requestPath):
+      # self.logger.debug('GET %s' % requestPath)
       headers = {
          'User-Agent': 'Indigo-Plugin-Updater',
          'Accept': 'application/vnd.github.v3+json'
@@ -139,19 +139,20 @@ class GitHubPluginUpdater(object):
       #conn.request('GET', requestPath, None, headers)
       #resp = conn.getresponse()
       f = subprocess.Popen(["curl",  requestPath], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
-   #'-H', str(headers), "-k",
+      #'-H', str(headers), "-k",
       out, err = f.communicate()
-      self.logger.debug(u'HTTP Err result:'+unicode(err) )
-      self.logger.debug(u'ReturnCode:{0}'.format(unicode(f.returncode)))
+      # self.logger.debug(u'HTTP Err result:'+unicode(err) )
+      # self.logger.debug(u'ReturnCode:{0}'.format(unicode(f.returncode)))
       #self.sleep(1)
       if (int(f.returncode) == 0):
          data = json.loads(out)
-         self.logger.debug(u'Json results:'+unicode(data))
+         # self.logger.debug(u'Json results:'+unicode(data))
       elif (400 <= f.status < 500):
          error = json.loads(out)
-         self.logger.error('%s' % error['message'])
+         # self.logger.error('%s' % error['message'])
       else:
-         self.logger.error('Error: %s' % unicode(err))
+         pass
+         # self.logger.error('Error: %s' % unicode(err))
 
       return data
   
