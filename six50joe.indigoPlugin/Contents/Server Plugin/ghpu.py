@@ -309,8 +309,14 @@ class GitHubPluginUpdater(object):
 
         self._debug('Downloading zip file: %s' % zipball)
 
-        zipdata = urlopen(zipball).read()
-        zipfile = ZipFile(StringIO(zipdata))
+        # zipdata = urlopen(zipball).read()
+
+        f = subprocess.Popen(["curl", "-k", zipball], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
+        out, err = f.communicate()
+
+        lines = out.split('\n')
+
+        zipfile = ZipFile(StringIO(lines))
 
         self._debug('Verifying zip file (%d bytes)...' % len(zipdata))
         if (zipfile.testzip() != None):
