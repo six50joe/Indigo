@@ -608,7 +608,7 @@ class Plugin(indigo.PluginBase):
 
             self.writePropaneThresholds()
 
-        def archivePriorMonthLogs(self, action):
+        def archivePriorMonthLogs(self, action=None):
             
             var = indigo.variables['LogArchiveDir']
 
