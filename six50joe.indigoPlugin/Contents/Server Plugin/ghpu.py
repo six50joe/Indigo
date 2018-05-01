@@ -310,13 +310,40 @@ class GitHubPluginUpdater(object):
         self._debug('Downloading zip file: %s' % zipball)
 
         # zipdata = urlopen(zipball).read()
+        f = subprocess.Popen(["curl", "-L",  zipball], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
+        zipdata, err = f.communicate()
+        self._debug(u'HTTP Err result:'+unicode(err) )
+        self._debug(u'ReturnCode:{0}'.format(unicode(f.returncode)))
+        zipfile = ZipFile(StringIO(zipdata))
 
+        self._debug('Verifying zip file (%d bytes)...' % len(zipdata))
+        if (zipfile.testzip() != None):
+            raise Exception('Download corrupted')
+
+        return zipfile
+
+    
+    def _getZipFileFromRelease_nowork(self, release):
+        # download and verify zipfile from the release package
+        zipball = release.get('zipball_url', None)
+        if (zipball == None):
+            raise Exception('Invalid release package: no zipball')
+
+        self._debug('Downloading zip file: %s' % zipball)
+
+        # zipdata = urlopen(zipball).read()
+
+        # https://github.com/six50joe/Indigo/archive/v0.4.6.zip
         f = subprocess.Popen(["curl", "-k", zipball], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
         out, err = f.communicate()
 
+        self._debug(str(out))
+        self._debug(str(err))
+        
         lines = out.split('\n')
+        self._debug("Lines: %s" % str(lines))
 
-        zipfile = ZipFile(StringIO(lines))
+        zipfile = ZipFile(StringIO(out))
 
         self._debug('Verifying zip file (%d bytes)...' % len(zipdata))
         if (zipfile.testzip() != None):
