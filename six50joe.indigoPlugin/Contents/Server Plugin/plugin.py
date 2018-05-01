@@ -713,7 +713,7 @@ class Plugin(indigo.PluginBase):
                 self.logger.debug(str(out))
                 return out
                        
-        def mailRecentLogs(self, action):
+        def mailRecentLogs(self, action=None):
             var = indigo.variables['LogDir']
 
             if not var:
