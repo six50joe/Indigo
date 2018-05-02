@@ -25,6 +25,7 @@ import datetime
 import datetime
 import dateutil.relativedelta
 import re
+import socket
 
 CONFIG_FILE_DIR           = expanduser("~") + "/Documents"
 RELAY_THRESHOLDS_FILENAME = "relay_thresholds.txt"
@@ -363,23 +364,25 @@ class Plugin(indigo.PluginBase):
                 varName = props[u'resultVarName']
                 var = None
                 if len(varName) > 0:
-                        var = indigo.variables[varName]
+                     var = indigo.variables[varName]
 
-                for i in range(0, int(props[u'numRetries'])):
-                        reached = self.ping(props[u'ipOrUrl'])
-
-                        if reached:
-                                self.logger.debug("ping reached %s" % props[u'ipOrUrl'])
-                                if var:
-                                        indigo.variable.updateValue(var, value=unicode(True))
-                                return True
-                        else:
-                                self.logger.debug("retry ping to %s" % props[u'ipOrUrl'])
-                                time.sleep(int(props[u'retrySecs']))
-
-                if  var:
-                        indigo.variable.updateValue(var, value=unicode(False))
-                return False
+                retrySecs = int(props[u'numRetries'])
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.settimeout(retrySecs)
+                ipOrUrl = props[u'ipOrUrl']
+                try:
+                   s.connect((ipOrUrl, 8176))
+                   s.shutdown(2)
+                   self.logger.debug("Indigo is reachable at %s" % ipOrUrl)
+                   if  var:
+                       indigo.variable.updateValue(var, value=unicode(True))
+                   return True
+                except Exception as e:
+                  self.logger.debug(str(e))
+                  self.logger.debug("Indigo is NOT reachable at %s" % ipOrUrl)
+                  if  var:
+                      indigo.variable.updateValue(var, value=unicode(False))
+                  return False
 
         def checkDevicePresence(self, action):
             devList = self.getPresenceDevices()
