@@ -15,6 +15,10 @@
 		<Name>Archive Logs</Name>
 		<CallbackMethod>archivePriorMonthLogs</CallbackMethod>
 	</MenuItem>
+	<MenuItem id="redrawCharts">
+		<Name>Redraw Charts</Name>
+		<CallbackMethod>redrawCharts</CallbackMethod>
+	</MenuItem>
 	<MenuItem id="pingOtherHouse">
 		<Name>Ping Other House...</Name>
 		<ConfigUI actionId="pingOtherHouse"/>

@@ -671,6 +671,15 @@ class Plugin(indigo.PluginBase):
 
             rc = subprocess.call(gzcmd, shell=True, stdout=subprocess.PIPE)
 
+        def redrawCharts(self):
+            matplotlibPlugin = indigo.server.getPlugin("com.fogbert.indigoplugin.matplotlib")
+            try:
+                result = matplotlibPlugin.executeAction('refreshTheChartsAction')
+                if result is not None:
+                    indigo.server.log(result['message'])
+            except Exception as err:
+                indigo.server.log(u"Exception occurred: {0}".format(err))                
+            
         def mailAttachment(self, title, volume, path):
                 path = path.replace("/", ":")
                 if not path.startswith(":"):

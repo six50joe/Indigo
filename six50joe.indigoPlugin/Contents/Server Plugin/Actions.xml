@@ -9,6 +9,10 @@
 		<Name>Send recent logs as email attachment</Name>
 		<CallbackMethod>mailRecentLogs</CallbackMethod>
 	</Action>
+	<Action id="redrawCharts">
+		<Name>Redraw all matplotlib charts</Name>
+		<CallbackMethod>redrawCharts</CallbackMethod>
+	</Action>
 	<Action id="pingOtherHouse">
 		<Name>Ping other house</Name>
 		<CallbackMethod>pingOtherHouse</CallbackMethod>
