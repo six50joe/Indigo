@@ -228,7 +228,6 @@ class Plugin(indigo.PluginBase):
 		# WARNING	: More critical information to the user, warnings
 		# ERROR		: Errors not critical for plugin execution
 		# CRITICAL	: Errors critical for plugin execution, plugin will stop
-		
 		self.checkForUpdatesInterval = self.pluginPrefs.get(u'checkForUpdatesInterval', 24)
 		if self.checkForUpdatesInterval == u'':
 			self.checkForUpdates = False
@@ -782,4 +781,57 @@ class Plugin(indigo.PluginBase):
 
             self.mailAttachment("Recent Indigo Logs", "Macintosh HD", archiveDir)
                         
+
+        def updateElecUsageVar( var, value, thresholds, desc):
+            "Setl the status string according to the usage threshold"
+            if (value < thresholds[0]):
+                    indigo.variable.updateValue(var, desc[0])
+            elif (value < thresholds[1]):
+                    indigo.variable.updateValue(var, desc[1])
+            elif (value < thresholds[2]):
+                    indigo.variable.updateValue(var, desc[2])
+            else:	
+                    indigo.variable.updateValue(var, desc[3])
+            return
+        
+        def checkElectric(self, action):
+            "Get current electric usage values and update status"
+            props = action.props
+
+            clamp1Dev = props[u'clamp1Dev']
+            clamp2Dev = props[u'clamp2Dev']
+
+            thresh1 = int(props[u'thresh1'])
+            thresh2 = int(props[u'thresh2'])
+            thresh3 = int(props[u'thresh3'])
+            thresh4 = int(props[u'thresh4'])
+
+            thresholds = [thresh1, thresh2, thresh3, thresh4]
+            descriptions = ["minimal", "normal", "High", "VERY HIGH"]
+
+            clamp1 = indigo.devices[clamp1Dev]
+            clamp2 = indigo.devices[clamp2Dev]
+
+            c1Val = clamp1.displayStateValRaw 
+            c2Val = clamp2.displayStateValRaw
+ 
+            c1Var = indigo.variables["Clamp 1"]
+            c2Var = indigo.variables["Clamp 2"]
+
+            indigo.variable.updateValue(c1Var, c1Val)
+            indigo.variable.updateValue(c2Var, c2Val)
+
+            e1Var = indigo.variables["ElecUsage1Status"]
+            e2Var = indigo.variables["ElecUsage2Status"]
+            
+            updateElecUsageVar(e1Var, c1Val, thresholds, descriptions)
+            updateElecUsageVar(e2Var, c2Val, thresholds, descriptions)
+            
+            # indigo.server.log(str(e1Var))
+
+
+				
+
+	
+	
 

@@ -23,6 +23,10 @@
 		<Name>Ping Other House...</Name>
 		<ConfigUI actionId="pingOtherHouse"/>
 	</MenuItem>
+	<MenuItem id="checkElectric">
+		<Name>Check Electric</Name>
+		<ConfigUI actionId="checkElectric"/>
+	</MenuItem>
 	<MenuItem id="managePresenceDevices">
 		<Name>Manage Presence Devices</Name>
 		<ConfigUI actionId="managePresenceDevices"/>

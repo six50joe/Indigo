@@ -31,6 +31,30 @@
 			</Field>
 		</ConfigUI>
 	</Action>
+	<Action id="checkElectric">
+		<Name>Manage Presence Devices</Name>
+                <Label>Clamp Devices:</Label>
+		<ConfigUI>
+			<Field id="clamp1Dev" type="textfield">
+				<Label>Clamp 1 Device:</Label>
+			</Field>
+			<Field id="clamp2Dev" type="textfield">
+				<Label>Clamp 2 Device:</Label>
+			</Field>
+			<Field id="thresh1" type="textfield">
+				<Label>Threshold 1 (lowest):</Label>
+			</Field>
+			<Field id="thresh2" type="textfield">
+				<Label>Threshold 2 (normal):</Label>
+			</Field>
+			<Field id="thresh3" type="textfield">
+				<Label>Threshold 3 (high):</Label>
+			</Field>
+			<Field id="thresh4" type="textfield">
+				<Label>Threshold 4 (very high):</Label>
+			</Field>
+		</ConfigUI>
+	</Action>
 	<Action id="managePresenceDevices">
 		<Name>Manage Presence Devices</Name>
                 <Label>Presence Devices:</Label>
