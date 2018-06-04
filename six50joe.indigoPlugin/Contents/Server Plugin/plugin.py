@@ -782,7 +782,7 @@ class Plugin(indigo.PluginBase):
             self.mailAttachment("Recent Indigo Logs", "Macintosh HD", archiveDir)
                         
 
-        def updateElecUsageVar( var, value, thresholds, desc):
+        def updateElecUsageVar(self, var, value, thresholds, desc):
             "Setl the status string according to the usage threshold"
             if (value < thresholds[0]):
                     indigo.variable.updateValue(var, desc[0])
@@ -796,6 +796,7 @@ class Plugin(indigo.PluginBase):
         
         def checkElectric(self, action):
             "Get current electric usage values and update status"
+
             props = action.props
 
             clamp1Dev = props[u'clamp1Dev']
@@ -815,17 +816,19 @@ class Plugin(indigo.PluginBase):
             c1Val = clamp1.displayStateValRaw 
             c2Val = clamp2.displayStateValRaw
  
-            c1Var = indigo.variables["Clamp 1"]
-            c2Var = indigo.variables["Clamp 2"]
+            c1Var = indigo.variables["Clamp1"]
+            c2Var = indigo.variables["Clamp2"]
 
-            indigo.variable.updateValue(c1Var, c1Val)
-            indigo.variable.updateValue(c2Var, c2Val)
+            indigo.variable.updateValue(c1Var, str(c1Val))
+            indigo.variable.updateValue(c2Var, str(c2Val))
 
             e1Var = indigo.variables["ElecUsage1Status"]
             e2Var = indigo.variables["ElecUsage2Status"]
+
+            self.logger.debug("Setting clamp1 var to %s, clamp2 to %s" % (c1Val, c2Val))
             
-            updateElecUsageVar(e1Var, c1Val, thresholds, descriptions)
-            updateElecUsageVar(e2Var, c2Val, thresholds, descriptions)
+            self.updateElecUsageVar(e1Var, c1Val, thresholds, descriptions)
+            self.updateElecUsageVar(e2Var, c2Val, thresholds, descriptions)
             
             # indigo.server.log(str(e1Var))
 

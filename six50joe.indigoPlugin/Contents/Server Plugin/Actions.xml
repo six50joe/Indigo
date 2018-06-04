@@ -32,7 +32,8 @@
 		</ConfigUI>
 	</Action>
 	<Action id="checkElectric">
-		<Name>Manage Presence Devices</Name>
+		<Name>Update electric usage variables</Name>
+		<CallbackMethod>checkElectric</CallbackMethod>
                 <Label>Clamp Devices:</Label>
 		<ConfigUI>
 			<Field id="clamp1Dev" type="textfield">
