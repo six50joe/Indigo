@@ -374,13 +374,13 @@ class Plugin(indigo.PluginBase):
                    s.shutdown(2)
                    self.logger.debug("Indigo is reachable at %s" % ipOrUrl)
                    if  var:
-                       indigo.variable.updateValue(var, value=unicode(True))
+                       indigo.variable.updateValue(var, value=unicode("true"))
                    return True
                 except Exception as e:
                   self.logger.debug(str(e))
                   self.logger.debug("Indigo is NOT reachable at %s" % ipOrUrl)
                   if  var:
-                      indigo.variable.updateValue(var, value=unicode(False))
+                      indigo.variable.updateValue(var, value=unicode("false"))
                   return False
 
         def checkDevicePresence(self, action):
