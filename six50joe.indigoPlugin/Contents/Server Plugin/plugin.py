@@ -670,7 +670,7 @@ class Plugin(indigo.PluginBase):
 
             rc = subprocess.call(gzcmd, shell=True, stdout=subprocess.PIPE)
 
-        def redrawCharts(self):
+        def redrawCharts(self, param1=None):
             matplotlibPlugin = indigo.server.getPlugin("com.fogbert.indigoplugin.matplotlib")
             try:
                 result = matplotlibPlugin.executeAction('refreshTheChartsAction')
