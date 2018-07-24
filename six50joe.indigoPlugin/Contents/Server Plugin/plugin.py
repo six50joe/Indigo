@@ -648,7 +648,7 @@ class Plugin(indigo.PluginBase):
             tarPathGz = "%s.gz" % tarPath
 
             if (os.path.exists(tarPathGz)):
-                self.logger.info("Last month archive already created; no action taken")
+                self.logger.info("Last month archive already created; no action taken (%s)" % tarPathGz)
                 return
             else:
                 self.logger.info("Creating last month archive: %s" % tarPath)
