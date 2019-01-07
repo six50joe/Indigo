@@ -369,7 +369,7 @@ class Plugin(indigo.PluginBase):
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 s.settimeout(retrySecs)
                 ipOrUrl = props[u'ipOrUrl']
-                port    = props[u'port']
+                port    = int(props[u'port'])
                 try:
                    s.connect((ipOrUrl, port))
                    s.shutdown(2)
