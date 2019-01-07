@@ -19,6 +19,10 @@
 		<Name>Redraw Charts</Name>
 		<CallbackMethod>redrawCharts</CallbackMethod>
 	</MenuItem>
+	<MenuItem id="pingAddress">
+		<Name>Ping Address...</Name>
+		<ConfigUI actionId="pingAddress"/>
+	</MenuItem>
 	<MenuItem id="pingOtherHouse">
 		<Name>Ping Other House...</Name>
 		<ConfigUI actionId="pingOtherHouse"/>

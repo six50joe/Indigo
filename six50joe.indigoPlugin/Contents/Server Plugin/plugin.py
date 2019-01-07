@@ -359,6 +359,10 @@ class Plugin(indigo.PluginBase):
 	########################################
 
 	def pingOtherHouse(self, action):
+                action.props[u'port'] = 8176
+                pingAddress(action)
+                
+	def pingAddress(self, action):
 		props = action.props
                 varName = props[u'resultVarName']
                 var = None
@@ -369,8 +373,9 @@ class Plugin(indigo.PluginBase):
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 s.settimeout(retrySecs)
                 ipOrUrl = props[u'ipOrUrl']
+                port    = props[u'port']
                 try:
-                   s.connect((ipOrUrl, 8176))
+                   s.connect((ipOrUrl, port))
                    s.shutdown(2)
                    self.logger.debug("Indigo is reachable at %s" % ipOrUrl)
                    if  var:

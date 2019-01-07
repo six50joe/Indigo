@@ -13,16 +13,37 @@
 		<Name>Redraw all matplotlib charts</Name>
 		<CallbackMethod>redrawCharts</CallbackMethod>
 	</Action>
+	<Action id="pingAddress">
+		<Name>Ping other house</Name>
+		<CallbackMethod>pingAddress</CallbackMethod>
+		<ConfigUI>
+			<Field id="ipOrUrl" type="textfield">
+				<Label>IP or URL:</Label>
+			</Field>	
+			<Field id="port" type="textfield"  defaultValue="80">
+				<Label>Port:</Label>
+			</Field>
+   		    <Field id="retrySecs" type="textfield">
+				<Label>Seconds between retries:</Label>
+			</Field>j
+			<Field id="numRetries" type="textfield">
+				<Label>Number of retries:</Label>
+			</Field>
+			<Field id="resultVarName" type="textfield">
+				<Label>Name of variable to store result in:</Label>
+			</Field>
+		</ConfigUI>
+	</Action>
 	<Action id="pingOtherHouse">
 		<Name>Ping other house</Name>
 		<CallbackMethod>pingOtherHouse</CallbackMethod>
 		<ConfigUI>
 			<Field id="ipOrUrl" type="textfield">
 				<Label>IP or URL:</Label>
-			</Field>
-			<Field id="retrySecs" type="textfield">
+			</Field>	
+   		    <Field id="retrySecs" type="textfield">
 				<Label>Seconds between retries:</Label>
-			</Field>
+			</Field>j
 			<Field id="numRetries" type="textfield">
 				<Label>Number of retries:</Label>
 			</Field>
