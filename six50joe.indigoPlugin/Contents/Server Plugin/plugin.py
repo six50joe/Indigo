@@ -358,10 +358,6 @@ class Plugin(indigo.PluginBase):
 	# Actions
 	########################################
 
-	def pingOtherHouse(self, action):
-                action.props[u'port'] = 8176
-                pingAddress(action)
-                
 	def pingAddress(self, action):
 		props = action.props
                 varName = props[u'resultVarName']
@@ -388,6 +384,10 @@ class Plugin(indigo.PluginBase):
                       indigo.variable.updateValue(var, value=unicode("false"))
                   return False
 
+	def pingOtherHouse(self, action):
+                action.props[u'port'] = 8176
+                pingAddress(action)
+                
         def checkDevicePresence(self, action):
             devList = self.getPresenceDevices()
             deviceReached = False
