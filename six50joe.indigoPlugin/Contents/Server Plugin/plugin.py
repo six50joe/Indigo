@@ -386,7 +386,7 @@ class Plugin(indigo.PluginBase):
 
 	def pingOtherHouse(self, action):
                 action.props[u'port'] = 8176
-                pingAddress(action)
+                self.pingAddress(action)
                 
         def checkDevicePresence(self, action):
             devList = self.getPresenceDevices()
