@@ -358,7 +358,7 @@ class Plugin(indigo.PluginBase):
 	# Actions
 	########################################
 
-	def pingAddress(self, action, port=80):
+	def pingAddress(self, action, port=None):
 		props = action.props
                 varName = props[u'resultVarName']
                 var = None
@@ -369,16 +369,22 @@ class Plugin(indigo.PluginBase):
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 s.settimeout(retrySecs)
                 ipOrUrl = props[u'ipOrUrl']
+
+                if not port:
+                   port = int(props[u'port'])
+                else:
+                   port = int(port)
+                   
                 try:
                    s.connect((ipOrUrl, port))
                    s.shutdown(2)
-                   self.logger.debug("Indigo is reachable at %s" % ipOrUrl)
+                   self.logger.debug("%s is reachable at port %d" % (ipOrUrl, port))
                    if  var:
                        indigo.variable.updateValue(var, value=unicode("true"))
                    return True
                 except Exception as e:
                   self.logger.debug(str(e))
-                  self.logger.debug("Indigo is NOT reachable at %s" % ipOrUrl)
+                  self.logger.debug("%s is NOT reachable at port %d" % (ipOrUrl, port))
                   if  var:
                       indigo.variable.updateValue(var, value=unicode("false"))
                   return False
@@ -463,6 +469,7 @@ class Plugin(indigo.PluginBase):
             indigo.activePlugin.sleep(1)
             indigo.device.statusRequest(analog)
             self.logger.info("sensor value is: " + str(analog.sensorValue))
+            xyz
             return analog.sensorValue
             
 
@@ -544,6 +551,8 @@ class Plugin(indigo.PluginBase):
             indigo.variable.updateValue(propaneVar, str(calcPct))
             propaneStrVar = indigo.variables["PropaneLevelStr"]
             indigo.variable.updateValue(propaneStrVar, level)
+            sensorVar     = indigo.variables["PropaneGaugeReading"]
+            indigo.variable.updateValue(sensorVar, level)
 
             self.logger.info("Propane level is %s" % level)
 					
