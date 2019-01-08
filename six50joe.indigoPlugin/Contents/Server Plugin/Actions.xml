@@ -14,7 +14,7 @@
 		<CallbackMethod>redrawCharts</CallbackMethod>
 	</Action>
 	<Action id="pingAddress">
-		<Name>Ping other house</Name>
+		<Name>Ping address</Name>
 		<CallbackMethod>pingAddress</CallbackMethod>
 		<ConfigUI>
 			<Field id="ipOrUrl" type="textfield">
