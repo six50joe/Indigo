@@ -469,7 +469,6 @@ class Plugin(indigo.PluginBase):
             indigo.activePlugin.sleep(1)
             indigo.device.statusRequest(analog)
             self.logger.info("sensor value is: " + str(analog.sensorValue))
-            xyz
             return analog.sensorValue
             
 
