@@ -551,7 +551,7 @@ class Plugin(indigo.PluginBase):
             propaneStrVar = indigo.variables["PropaneLevelStr"]
             indigo.variable.updateValue(propaneStrVar, level)
             sensorVar     = indigo.variables["PropaneGaugeReading"]
-            indigo.variable.updateValue(sensorVar, sensor)
+            indigo.variable.updateValue(sensorVar, str(sensor))
 
             self.logger.info("Propane level is %s" % level)
 					
