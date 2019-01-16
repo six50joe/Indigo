@@ -22,10 +22,10 @@ from operator import itemgetter
 from ghpu import GitHubPluginUpdater
 from os.path import expanduser
 import datetime
-import datetime
 import dateutil.relativedelta
 import re
 import socket
+import time
 
 CONFIG_FILE_DIR           = expanduser("~") + "/Documents"
 RELAY_THRESHOLDS_FILENAME = "relay_thresholds.txt"
@@ -358,6 +358,33 @@ class Plugin(indigo.PluginBase):
 	# Actions
 	########################################
 
+        def doPingAddressAtPort(self,
+                                ipOrUrl,
+                                port,
+                                numRetries,
+                                retrySecs,
+                                var=None):
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.settimeout(retrySecs)
+
+                for r in range(1, numRetries + 1):
+                        try:
+                           s.connect((ipOrUrl, port))
+                           s.shutdown(2)
+                           self.logger.debug("%s is reachable at port %d" % (ipOrUrl, port))
+                           if  var:
+                               indigo.variable.updateValue(var, value=unicode("true"))
+                           return True
+                        except Exception as e:
+                          self.logger.debug(str(e))
+                          self.logger.debug("%s is NOT reachable at port %d, retry %d" % (ipOrUrl, port, r))
+                        time.sleep(retrySecs)
+
+                if  var:
+                   indigo.variable.updateValue(var, value=unicode("false"))
+                return False
+        
+        
 	def pingAddress(self, action, port=None):
 		props = action.props
                 varName = props[u'resultVarName']
@@ -365,29 +392,21 @@ class Plugin(indigo.PluginBase):
                 if len(varName) > 0:
                      var = indigo.variables[varName]
 
-                retrySecs = int(props[u'numRetries'])
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.settimeout(retrySecs)
+                numRetries = int(props[u'numRetries'])
+                retrySecs  = int(props[u'retrySecs'])
+
                 ipOrUrl = props[u'ipOrUrl']
 
                 if not port:
                    port = int(props[u'port'])
                 else:
                    port = int(port)
-                   
-                try:
-                   s.connect((ipOrUrl, port))
-                   s.shutdown(2)
-                   self.logger.debug("%s is reachable at port %d" % (ipOrUrl, port))
-                   if  var:
-                       indigo.variable.updateValue(var, value=unicode("true"))
-                   return True
-                except Exception as e:
-                  self.logger.debug(str(e))
-                  self.logger.debug("%s is NOT reachable at port %d" % (ipOrUrl, port))
-                  if  var:
-                      indigo.variable.updateValue(var, value=unicode("false"))
-                  return False
+
+                self.doPingAddressAtPort(ipOrUrl,
+                                    port,
+                                    numRetries,
+                                    retrySecs,
+                                    var)
 
 	def pingOtherHouse(self, action):
                 self.pingAddress(action, 8176)
