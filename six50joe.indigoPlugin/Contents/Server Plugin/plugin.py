@@ -867,6 +867,7 @@ class Plugin(indigo.PluginBase):
 
             props = action.props
 
+            deviceName = props[u'deviceName']
             withinSecs = int(props[u'withinSecs'])
 
         def hasHeartbeat(self, deviceName, withinSecs=180):
