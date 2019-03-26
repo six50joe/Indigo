@@ -48,6 +48,11 @@
 		<ConfigUI actionId="calibratePropaneLevel"/>
 	</MenuItem>
 	<MenuItem id="separator" />
+	<MenuItem id="checkDeviceHeartbeat">
+		<Name>Check device heartbeat</Name>
+		<ConfigUI actionId="checkDeviceHeartbeat"/>
+	</MenuItem>
+	<MenuItem id="separator" />
 	<MenuItem id="checkPluginUpdates">
 		<Name>Check for plugin updates</Name>
 		<CallbackMethod>checkPluginUpdates</CallbackMethod>

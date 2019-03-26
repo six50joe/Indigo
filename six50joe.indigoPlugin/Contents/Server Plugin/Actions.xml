@@ -113,5 +113,17 @@
 			</Field>
 		</ConfigUI>
 	</Action>
+	<Action id="checkDeviceHeartbeat">
+		<Name>Check Device Heartbeat</Name>
+		<CallbackMethod>checkDeviceHeartbeat</CallbackMethod>
+		<ConfigUI>
+			<Field id="deviceName" type="textfield" defaultValue="">
+				<Label>Device name:</Label>
+			</Field>
+			<Field id="withinSecs" type="textfield" defaultValue="180">
+				<Label>Within secs:</Label>
+			</Field>
+		</ConfigUI>
+	</Action>
 </Actions>
 
