@@ -862,8 +862,16 @@ class Plugin(indigo.PluginBase):
             
             # indigo.server.log(str(e1Var))
 
+        def checkHeartbeat(self, action):
+            "See if the device has responded to Indigo recently"
 
-				
+            props = action.props
+
+            withinSecs = int(props[u'withinSecs'])
+
+        def hasHeartbeat(self, deviceName, withinSecs=180):
+            device = indigo.devices[deviceName]
+            self.logger.debug("Device heartbeat at: %d" % (device.lastChanged))
 
 	
 	
