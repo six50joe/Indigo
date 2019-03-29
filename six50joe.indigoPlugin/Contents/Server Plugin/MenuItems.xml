@@ -47,7 +47,6 @@
 		<Name>Calibrate Propane Level</Name>
 		<ConfigUI actionId="calibratePropaneLevel"/>
 	</MenuItem>
-	<MenuItem id="separator" />
 	<MenuItem id="checkDeviceHeartbeat">
 		<Name>Check device heartbeat</Name>
 		<ConfigUI actionId="checkDeviceHeartbeat"/>

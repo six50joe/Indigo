@@ -862,6 +862,41 @@ class Plugin(indigo.PluginBase):
             
             # indigo.server.log(str(e1Var))
 
+        def hasHeartbeat(self, deviceName, withinSecs=180):
+            device = indigo.devices[deviceName]
+            now = datetime.datetime.now()
+
+            lastChanged = device.lastChanged
+
+            if False:
+                    self.logger.debug("Device heartbeat at: %s, seconds since=%d" % \
+                              (lastChanged.strftime("%m/%d/%Y %H:%M:%S"), \
+                               (lastChanged - now).total_seconds()))
+
+            isResponding = True
+
+            delta = now - lastChanged
+            if delta.total_seconds() > withinSecs:
+                isResponding = False
+
+            statusVarName = deviceName + "_responding"
+
+            # Variable names can't have spaces
+            statusVarName = statusVarName.replace(" ", "_")
+            statusVarName = statusVarName.replace("/", "-")
+
+            statusVar = None
+            
+            # Create folders or variables if they have been somehow deleted.
+            if 'DeviceUpdate' not in indigo.variables.folders:
+                    indigo.variables.folder.create('DeviceUpdate')
+
+            if statusVarName not in indigo.variables:
+                indigo.variable.create(statusVarName, '', folder='DeviceUpdate')
+
+            statusVar = indigo.variables[statusVarName]
+            indigo.variable.updateValue(statusVar, str(isResponding))
+
         def checkDeviceHeartbeat(self, action):
             "See if the device has responded to Indigo recently"
 
@@ -869,11 +904,8 @@ class Plugin(indigo.PluginBase):
 
             deviceName = props[u'deviceName']
             withinSecs = int(props[u'withinSecs'])
-            hasHeartbeat(deviceName, withinSecs)
+            self.hasHeartbeat(deviceName, withinSecs)
 
-        def hasHeartbeat(self, deviceName, withinSecs=180):
-            device = indigo.devices[deviceName]
-            self.logger.debug("Device heartbeat at: %d" % (device.lastChanged))
 
 	
 	
