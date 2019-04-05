@@ -123,6 +123,15 @@
 			<Field id="withinSecs" type="textfield" defaultValue="180">
 				<Label>Within secs:</Label>
 			</Field>
+			<Field id="withinMinutes" type="textfield" defaultValue="0">
+				<Label>Within minutes:</Label>
+			</Field>
+			<Field id="withinHours" type="textfield" defaultValue="0">
+				<Label>Within hours:</Label>
+			</Field>
+			<Field id="withinDays" type="textfield" defaultValue="0">
+				<Label>Within days:</Label>
+			</Field>
 		</ConfigUI>
 	</Action>
 </Actions>

@@ -862,7 +862,12 @@ class Plugin(indigo.PluginBase):
             
             # indigo.server.log(str(e1Var))
 
-        def hasHeartbeat(self, deviceName, withinSecs=180):
+        def hasHeartbeat(self,
+                         deviceName,
+                         withinSecs=180,
+                         withinMinutes=0,
+                         withinHours=0,
+                         withinDays=0):
             device = indigo.devices[deviceName]
             now = datetime.datetime.now()
 
@@ -876,7 +881,15 @@ class Plugin(indigo.PluginBase):
             isResponding = True
 
             delta = now - lastChanged
-            if delta.total_seconds() > withinSecs:
+            threshold = withinSecs + \
+                    (withinMinutes * 60) + \
+                    (withinHours * 60 * 60) + \
+                    (withinDays * 24 * 60 * 60)
+
+            self.logger.debug("Threshold seconds=%d)" % threshold)
+            
+
+            if delta.total_seconds() > threshold:
                 isResponding = False
 
             statusVarName = deviceName + "_responding"
@@ -904,7 +917,14 @@ class Plugin(indigo.PluginBase):
 
             deviceName = props[u'deviceName']
             withinSecs = int(props[u'withinSecs'])
-            self.hasHeartbeat(deviceName, withinSecs)
+            withinMinutes = int(props[u'withinMinutes'])
+            withinHours = int(props[u'withinHours'])
+            withinDays = int(props[u'withinDays'])
+            self.hasHeartbeat(deviceName,
+                              withinSecs,
+                              withinMinutes,
+                              withinHours,
+                              withinDays)
 
 
 	
