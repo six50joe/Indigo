@@ -31,6 +31,9 @@ CONFIG_FILE_DIR           = expanduser("~") + "/Documents"
 RELAY_THRESHOLDS_FILENAME = "relay_thresholds.txt"
 PropaneThresholds = {}
 
+FLW_FOLDER_NAME      = "FlowMeter"
+FLW_NAM_LAST_READING = "FLW_LastReading"
+
 # Note the "indigo" module is automatically imported and made available inside
 # our global name space by the host process.
 
@@ -926,7 +929,24 @@ class Plugin(indigo.PluginBase):
                               withinHours,
                               withinDays)
 
+        def flowMeterUpdate(self, action):
+            "Update the latest flow meter readings"
+            
+            props = action.props
 
+            deviceName = props[u'deviceName']
 	
-	
+            # test to see if flow stats folder exists by Name
+            if not (FLW_FOLDER_NAME in indigo.variables.folders):
+                    indigo.server.log("folder named '%s' exists" % FLW_FOLDER_NAME)
+                    newFolder = indigo.variables.folder.create(FLW_FOLDER_NAME)
 
+            if FLW_NAM_LAST_READING not in indigo.variables:
+                indigo.variable.create(FLW_NAM_LAST_READING, '', folder=FLW_FOLDER_NAME)
+                    
+            readingVar = indigo.variables[FLW_NAM_LAST_READING]
+
+log             device.sensorValue
+            indigo.variable.updateValue(readingVar, str(isResponding))
+
+            xyz
