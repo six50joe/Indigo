@@ -946,7 +946,5 @@ class Plugin(indigo.PluginBase):
                     
             readingVar = indigo.variables[FLW_NAM_LAST_READING]
 
-log             device.sensorValue
-            indigo.variable.updateValue(readingVar, str(isResponding))
-
-            xyz
+            device.sensorValue
+            indigo.variable.updateValue(readingVar, str(sensorValue))
