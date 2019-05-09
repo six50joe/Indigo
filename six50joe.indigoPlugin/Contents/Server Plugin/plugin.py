@@ -31,8 +31,9 @@ CONFIG_FILE_DIR           = expanduser("~") + "/Documents"
 RELAY_THRESHOLDS_FILENAME = "relay_thresholds.txt"
 PropaneThresholds = {}
 
-FLW_FOLDER_NAME      = "FlowMeter"
-FLW_NAM_LAST_READING = "FLW_LastReading"
+FLW_FOLDER_NAME       = "FlowMeter"
+FLW_NAM_LAST_READING  = "FLW_LastReading"
+FLW_NAM_CURRENT_USAGE = "FLW_CurrentUsage"
 
 # Note the "indigo" module is automatically imported and made available inside
 # our global name space by the host process.
@@ -942,9 +943,21 @@ class Plugin(indigo.PluginBase):
                     newFolder = indigo.variables.folder.create(FLW_FOLDER_NAME)
 
             if FLW_NAM_LAST_READING not in indigo.variables:
-                indigo.variable.create(FLW_NAM_LAST_READING, '', folder=FLW_FOLDER_NAME)
+                indigo.variable.create(FLW_NAM_LAST_READING, '0', folder=FLW_FOLDER_NAME)
                     
             readingVar = indigo.variables[FLW_NAM_LAST_READING]
+            lastValue  = float(readingVar.value)
 
-            device.sensorValue
+            device = indigo.devices[deviceName]
+            sensorValue = device.sensorValue
             indigo.variable.updateValue(readingVar, str(sensorValue))
+
+            currentUsage = sensorValue - lastValue
+
+            if FLW_NAM_CURRENT_USAGE not in indigo.variables:
+                indigo.variable.create(FLW_NAM_CURRENT_USAGE, '0', folder=FLW_FOLDER_NAME)
+
+
+            currentUsageVar = indigo.variables[FLW_NAM_CURRENT_USAGE]
+
+            indigo.variable.updateValue(currentUsageVar, str(currentUsage))

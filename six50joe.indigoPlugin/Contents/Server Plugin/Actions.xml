@@ -134,5 +134,14 @@
 			</Field>
 		</ConfigUI>
 	</Action>
+	<Action id="flowMeterUpdate">
+		<Name>Update Flow Meter Reading</Name>
+		<CallbackMethod>flowMeterUpdate</CallbackMethod>
+		<ConfigUI>
+			<Field id="deviceName" type="textfield" defaultValue="">
+				<Label>Device name:</Label>
+			</Field>
+		</ConfigUI>
+	</Action>
 </Actions>
 
