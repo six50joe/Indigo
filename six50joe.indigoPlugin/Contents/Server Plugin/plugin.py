@@ -34,6 +34,7 @@ PropaneThresholds = {}
 FLW_FOLDER_NAME       = "FlowMeter"
 FLW_NAM_LAST_READING  = "FLW_LastReading"
 FLW_NAM_CURRENT_USAGE = "FLW_CurrentUsage"
+FLW_NAM_UPDATED_AT    = "FLW_UpatedAt"
 
 # Note the "indigo" module is automatically imported and made available inside
 # our global name space by the host process.
@@ -961,3 +962,17 @@ class Plugin(indigo.PluginBase):
             currentUsageVar = indigo.variables[FLW_NAM_CURRENT_USAGE]
 
             indigo.variable.updateValue(currentUsageVar, str(currentUsage))
+
+            now = datetime.datetime.now()
+            nowStr = now.strftime("%m/%d/%Y %H:%M:%S")
+
+            if FLW_NAM_UPDATED_AT not in indigo.variables:
+                indigo.variable.create(FLW_NAM_UPDATED_AT, '0', folder=FLW_FOLDER_NAME)
+
+            updatedAtVar = indigo.variables[FLW_NAM_UPDATED_AT]
+
+            indigo.variable.updateValue(updatedAtVar, nowStr)
+
+            
+                
+            
