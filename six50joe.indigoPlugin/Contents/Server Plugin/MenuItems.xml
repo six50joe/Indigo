@@ -51,6 +51,10 @@
 		<Name>Check device heartbeat</Name>
 		<ConfigUI actionId="checkDeviceHeartbeat"/>
 	</MenuItem>
+	<MenuItem id="flowMeterUpdate">
+		<Name>Update Flow Meter Reading</Name>
+		<ConfigUI actionId="flowMeterUpdate"/>
+	</MenuItem>
 	<MenuItem id="separator" />
 	<MenuItem id="checkPluginUpdates">
 		<Name>Check for plugin updates</Name>
