@@ -518,14 +518,12 @@ class Plugin(indigo.PluginBase):
 
             retry = 0
 
+	    pct=0
+	    nextPct=0
+
             while retry < 3:
                     firstThreshold=True
                     for pct, nextPct in self.iterate(sorted(PropaneThresholds.iterkeys(), key=int)):
-                        if pct is None:
-                            pct = 0
-          
-                        if nextPct is None:
-                            nextPct = 0
 
                         thresh = int(float(PropaneThresholds[pct]))
                         nextThresh = -1
