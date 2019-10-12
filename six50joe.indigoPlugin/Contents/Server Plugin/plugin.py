@@ -520,6 +520,8 @@ class Plugin(indigo.PluginBase):
 
 	    pct=0
 	    nextPct=0
+	    calcPct=0
+	    level = ""
 
             while retry < 3:
                     firstThreshold=True
